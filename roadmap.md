@@ -6,17 +6,30 @@ If you'd like to add an idea or feature request, open a github issue, write me a
 
 ## Planned (by me) features
 Invite-a-moose / 'Multiplayer' (working on it)
+
 Social interaction
+
 Better stats / character traits
 
+
 ## User-requested features
-Bigger / Longer lasting food (done)
+
+Bigger / longer lasting food (done)
+
 Adjustable food spawn rate (done)
+
 Ancestors on 'About animal' page (working on it)
+
 Day-Night cycle (planned)
+
 Adjust mating probabiity (planned)
+
 Make hungry moose less likely to mate (planned)
+
 Seasons
+
 More social interaction
+
 Display character traits on main screen
-Quick access to 'About animal' page
+
+Quick access to 'About animal' page 
