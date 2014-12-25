@@ -356,7 +356,7 @@ Page {
 
 
     Image {
-        source: "../img/pond_trans.png"
+        source: "../img/pond_day.png"
         id: pond
         opacity: 1
         width: 100
