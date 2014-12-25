@@ -26,6 +26,8 @@ Adjust mating probabiity (planned)
 
 Make hungry moose less likely to mate (planned)
 
+Adjust age slowdown (planned)
+
 Seasons
 
 More social interaction
@@ -33,3 +35,5 @@ More social interaction
 Display character traits on main screen
 
 Quick access to 'About animal' page 
+
+Fix: Font has no umlauts
