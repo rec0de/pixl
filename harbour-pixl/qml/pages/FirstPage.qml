@@ -12,6 +12,7 @@ Page {
     property var hearts: new Array()
     property bool debug: false //Display debug tools and disable automatic animal spawning
     property bool slowdown: true // Enables/Disables age based animal slowdown
+    property int foodspawn: 85 // Food spawn probability (per tick)
 
     Component.onCompleted: {
         DB.initialize();
@@ -56,15 +57,21 @@ Page {
               }
             }
         }
+    }
+
+    FontLoader { id: pixels; source: "../img/pixelmix.ttf" }
+
+    // Loads and applys settings from DB
+    function updatesettings(){
 
         // Update night mode
         if(DB.getsett(0) == 1){
-            background.source = "../img/back_night.png";
+            rect.color = '#334613';
             pond.source = "../img/pond_night.png";
         }
         else{
-            background.source = "../img/back.png";
-            pond.source = "../img/pond.png";
+            rect.color = '#84b331';
+            pond.source = "../img/pond_day.png";
         }
 
         // Update debug mode
@@ -82,9 +89,16 @@ Page {
         else{
             page.slowdown = false;
         }
-    }
 
-    FontLoader { id: pixels; source: "../img/pixelmix.ttf" }
+        // Update food rate
+        if(DB.getsett(3) != -1){
+            page.foodspawn = DB.getsett(3);
+        }
+        else{
+            page.foodspawn = 85; // Use default if DB value is not set
+        }
+
+    }
 
     // Makes the start text blink
     function blink() {
@@ -131,31 +145,9 @@ Page {
 
         // If game was paused
         if(ticker.running == false){
-            // Update night mode
-            if(DB.getsett(0) == 1){
-                background.source = "../img/back_night.png";
-                pond.source = "../img/pond_night.png";
-            }
-            else{
-                background.source = "../img/back.png";
-                pond.source = "../img/pond.png";
-            }
 
-            // Update debug mode
-            if(DB.getsett(1) == 1){
-                page.debug = true;
-            }
-            else{
-                page.debug = false;
-            }
-
-            // Update age slowdown
-            if(DB.getsett(2) != 0){
-                page.slowdown = true;
-            }
-            else{
-                page.slowdown = false;
-            }
+            // Update all settings
+            updatesettings();
 
             // Update animal names
             for(var i = 0; i < page.animals.length; i++){
@@ -174,9 +166,10 @@ Page {
             logo.visible = true;
         }
         else{
+          // Spawn food at touch location
           if(x < (page.width - 30)){ // Avoid uneatable food
               var food_comp = Qt.createComponent("../components/food.qml");
-              var temp = food_comp.createObject(page, {x: x, y: y});
+              var temp = food_comp.createObject(page, {x: x, y: y, manual: true});
               page.food.push(temp);
           }
         }
@@ -196,7 +189,7 @@ Page {
         }
 
         // Spawn food
-        if(Math.floor(Math.random()*85) == 1){
+        if(Math.floor(Math.random()*page.foodspawn) == 1){
             var x = Math.floor(Math.random()*(page.width-30));
             var y = Math.floor(Math.random()*(page.height-70))+60;
             var food_comp = Qt.createComponent("../components/food.qml");
@@ -321,16 +314,19 @@ Page {
         id: rect
         width: parent.width
         height: parent.height
-        color: 'transparent'
+        color: '#84b331'
         MouseArea {
         anchors.fill: parent
         onClicked: touch(mouseX, mouseY)
+        }
+        Behavior on color {
+            ColorAnimation {duration: 700 }
         }
     }
 
     Image {
         id: background
-        source: "../img/back.png"
+        source: "../img/back_trans.png"
         opacity: 1
         width: rect.width
         height: rect.height
@@ -360,7 +356,7 @@ Page {
 
 
     Image {
-        source: "../img/pond.png"
+        source: "../img/pond_trans.png"
         id: pond
         opacity: 1
         width: 100
@@ -383,7 +379,7 @@ Page {
         id: menu
         y: -5
         x: -5
-        color: rect.color
+        color: 'transparent'
         height: 65
         width: rect.width + 10
         border.color: '#ffffff'

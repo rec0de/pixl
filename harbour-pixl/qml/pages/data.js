@@ -7,6 +7,7 @@
 // 0   Night Mode (Default off)
 // 1   Debug Mode (Default off)
 // 2   Age Slowdown (Default on)
+// 3   Food spawn rate (Deafult: 85)
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {
@@ -148,7 +149,7 @@ function getsett(uid) {
         if (rs.rows.length > 0) {
             res = rs.rows.item(0).value
         } else {
-            res = "Error";
+            res = "-1";
             //console.log ("Error reading settings from DB");
         }
     })

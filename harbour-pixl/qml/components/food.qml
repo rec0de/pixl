@@ -7,11 +7,12 @@ Item {
     y: 100
     z: 0
     property bool active: true
+    property bool manual: false // True if food was spawned manually by user
 
     // Couldnt figure out how to do static textures...
 
     Image {
-      source: "../img/food.png"
+      source: (manual ? "../img/bigfood.png" : "../img/food.png")
       id: shadow
       width: 20
       height: 25
@@ -22,7 +23,7 @@ Item {
 
     Timer {
         id: despawner
-        interval: 20000
+        interval: (manual ? 40000 : 20000)
         running: true
         repeat: false
         onTriggered: parent.despawn()

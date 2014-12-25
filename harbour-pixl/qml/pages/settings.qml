@@ -17,6 +17,13 @@ Page {
         if(DB.getsett(2) != 0){
             slowage.checked = true;
         }
+
+        if(DB.getsett(3) != -1){
+            foodrate.value = DB.getsett(3);
+        }
+        else{
+            foodrate.value = 85; // Use default if DB value is not set
+        }
     }
 
     function switchnight(){
@@ -54,6 +61,13 @@ Page {
             slowage.checked = true;
         }
     }
+
+
+    // Save new foodrate to DB
+    function updatefoodrate(){
+        DB.setsett(3, foodrate.value);
+    }
+
 
     SilicaFlickable {
         anchors.fill: parent
@@ -96,6 +110,20 @@ Page {
                 checked: false
                 onClicked: {
                     switchslowage()
+                }
+            }
+
+            Slider {
+                id: foodrate
+                width: parent.width
+                minimumValue: 20
+                maximumValue: 150
+                value: 85
+                stepSize: 1
+                label: 'Food spawn rate (lower = more)'
+                valueText: value
+                onValueChanged: {
+                    updatefoodrate()
                 }
             }
 
