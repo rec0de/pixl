@@ -8,6 +8,7 @@
 // 1   Debug Mode (Default off)
 // 2   Age Slowdown (Default on)
 // 3   Food spawn rate (Deafult: 85)
+// 4   First upload? (Default: true)
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {

@@ -6,15 +6,6 @@ Page {
     id: page
     property string code: ''
 
-    function invite(code){
-        if(code.length !== 5){
-            updatemessage('Error: Code too short');
-        }
-        else{
-            load(code);
-        }
-    }
-
     function updatemessage(msg){
         msgtext.text = msg;
         message.visible = true;
@@ -82,7 +73,7 @@ Page {
                 leftMargin: Theme.paddingMedium
                 rightMargin: Theme.paddingMedium
             }
-            text: 'Please enter the guest animals 5 digit code'
+            text: 'Please enter the guest animals unique code'
         }
 
         Label{
@@ -120,7 +111,7 @@ Page {
             }
             Button {
                text: "Invite"
-               onClicked: invite(page.code)
+               onClicked: load(page.code)
             }
         }
      }

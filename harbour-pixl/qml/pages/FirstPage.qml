@@ -122,7 +122,7 @@ Page {
             loaded = false;
 
             for(var j = 0; j < page.animals.length; j++){
-                if(page.animals[j].dna == guestmoose[i].dna){
+                if(page.animals[j].dna === guestmoose[i].dna && page.animals[j].name === guestmoose[i].name){
                     // Moose is already loaded
                     loaded = true;
                     break;

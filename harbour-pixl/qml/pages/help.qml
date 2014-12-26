@@ -152,14 +152,12 @@ Page {
                 }
             }
 
-            // Coming when it's ready :)
-
             SectionHeader {
                 text: "Multiplayer"
             }
 
             Label {
-                text:   'You can invite moose from your friends phone/tablet over to yours and let them play together by selecting the \'Upload\' option on an animals About page. Enter the 5 digit code you receive after uploading the animal on the host device to invite it.. Guest animals can\'t mate with local moose and changes (age, death) of guest animals are not synced back to their home device. A (g) behind the animals name indicates that it is a guest animal. Guest animals can be \'sent home\' from their stats page.'
+                text:   'You can invite moose from your friends phone/tablet over to yours and let them play together by selecting the \'Upload\' option on an animals About page. Enter the code you receive after uploading the animal on the host device to invite it. Guest animals can\'t mate with local moose and changes (age, death) of guest animals are not synced back to their home device. A (g) behind the animals name indicates that it is a guest animal. Guest animals can be \'sent home\' from their stats page.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
