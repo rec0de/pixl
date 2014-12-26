@@ -57,6 +57,9 @@ Page {
               }
             }
         }
+
+        // Update other settings
+        updatesettings();
     }
 
     FontLoader { id: pixels; source: "../img/pixelmix.ttf" }

@@ -18,6 +18,8 @@ Bigger / longer lasting food (done)
 
 Adjustable food spawn rate (done)
 
+Fix: Font has no umlauts (done)
+
 Ancestors on 'About animal' page (working on it)
 
 Day-Night cycle (planned)
@@ -35,5 +37,3 @@ More social interaction
 Display character traits on main screen
 
 Quick access to 'About animal' page 
-
-Fix: Font has no umlauts
