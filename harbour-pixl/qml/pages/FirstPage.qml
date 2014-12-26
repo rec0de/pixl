@@ -112,8 +112,30 @@ Page {
             }
           }
         }
-        // Add new guest moose
-        // TODO
+
+        // Add new guest animals
+        var guestmoose = DB.getnonlocal();
+        var animal_comp = Qt.createComponent("../components/animal.qml");
+        var loaded = false;
+
+        for(i = 0; i < guestmoose.length; i++){
+            loaded = false;
+
+            for(var j = 0; j < page.animals.length; j++){
+                if(page.animals[j].dna == guestmoose[i].dna){
+                    // Moose is already loaded
+                    loaded = true;
+                    break;
+                }
+            }
+            if(!loaded){
+                // If moose is not loaded, load moose
+                var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: guestmoose[i].name, age: guestmoose[i].age, local: false});
+                temp.importfromdna(guestmoose[i].dna);
+                temp.tick(); // Move animal to target coords
+                page.animals.push(temp);
+            }
+        }
 
 
     }
@@ -454,7 +476,7 @@ Page {
         visible: page.debug
         y: 55
         x: -5
-        color: rect.color
+        color: 'transparent'
         height: 65
         width: rect.width + 10
         border.color: '#ffffff'

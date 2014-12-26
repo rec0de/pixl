@@ -90,7 +90,7 @@ Image {
         id: name
         visible: false
         x: 50
-        text: parent.name + '<br>' + Math.round((parent.energy / parent.maxenergy)*100) + '%'
+        text: parent.name + ( parent.local ? '' : ' (g)') + '<br>' + Math.round((parent.energy / parent.maxenergy)*100) + '%' // Display name (add guest indicator if needed) and energy
         color: '#ffffff'
         font.pixelSize: 16
         font.family: pixels.name
@@ -338,12 +338,6 @@ Image {
             energymoving = energystill * (1 + maxspeed / 10) * (1 + parseInt(dna.substr(24, 4), 2)/15)
             jumpforce = 7 + parseInt(dna.substr(33, 3), 2);
             searchingduration = 300 + parseInt(dna.substr(36, 4), 2)*100;
-
-            // Mark guest animals
-            if(!local){
-                // Add (g) behind the animals name
-                name.text = animal.name + ' (g)' + '<br>' + Math.round((parent.energy / parent.maxenergy)*100) + '%';
-            }
         }
     }
 

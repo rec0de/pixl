@@ -28,12 +28,12 @@ Page {
         page.guests = DB.getnonlocal();
 
         for(var i = 0; i < page.guests.length; i++){
-            animalModel.append({"name": page.guests[i].name + ' (g)', "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
+            animalModel.append({"name": page.guests[i].name, "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
         }
 
 
         // Add Invite animal element
-        animalModel.append({"name": 'Invite animal...', "animal": false})
+        animalModel.append({"name": 'Invite animal...', "animal": false, "local": true})
     }
 
 
@@ -52,11 +52,11 @@ Page {
         page.guests = DB.getnonlocal();
 
         for(var i = 0; i < page.guests.length; i++){
-            animalModel.append({"name": page.guests[i].name + ' (g)', "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
+            animalModel.append({"name": page.guests[i].name, "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
         }
 
         // Invite animal element
-        animalModel.append({"name": 'Invite animal...', "animal": false})
+        animalModel.append({"name": 'Invite animal...', "animal": false, "local": true})
 
     }
 
@@ -141,7 +141,7 @@ Page {
 
             Label {
                 x: Theme.paddingLarge
-                text: name
+                text: local ? name : name + ' (g)'
                 anchors.verticalCenter: parent.verticalCenter
                 color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
             }
