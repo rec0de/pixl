@@ -107,6 +107,22 @@ function getnonlocal() {
     return res
 }
 
+// Checks if a guest moose is still in DB
+function checknonlocal(dna) {
+    var db = getDatabase();
+    var res;
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT name FROM nonlocal WHERE dna=?', [dna]);
+        if (rs.rows.length > 0) {
+            res = true; // Moose is still there
+        } else {
+            res = false; // Moose has been sent home
+        }
+    })
+    return res
+}
+
+
 // This function is used to remove dead animals
 function deleterow(dna){
     var db = getDatabase();

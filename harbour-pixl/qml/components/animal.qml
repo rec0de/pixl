@@ -341,7 +341,8 @@ Image {
 
             // Mark guest animals
             if(!local){
-                name.visible = true;
+                // Add (g) behind the animals name
+                name.text = animal.name + ' (g)' + '<br>' + Math.round((parent.energy / parent.maxenergy)*100) + '%';
             }
         }
     }

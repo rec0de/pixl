@@ -28,7 +28,7 @@ Page {
         page.guests = DB.getnonlocal();
 
         for(var i = 0; i < page.guests.length; i++){
-            animalModel.append({"name": page.guests[i].name, "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
+            animalModel.append({"name": page.guests[i].name + ' (g)', "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
         }
 
 
@@ -52,7 +52,7 @@ Page {
         page.guests = DB.getnonlocal();
 
         for(var i = 0; i < page.guests.length; i++){
-            animalModel.append({"name": page.guests[i].name, "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
+            animalModel.append({"name": page.guests[i].name + ' (g)', "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
         }
 
         // Invite animal element

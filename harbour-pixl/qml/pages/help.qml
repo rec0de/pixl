@@ -43,7 +43,7 @@ Page {
             }
 
             Label {
-                text:   'You can spawn food by tapping on the screen. By tapping on a specific animal, you show/hide its name and energy status. Animal stats can be accessed from the "Info" menu. You can also access the "Settings" page from there where you can activate the "Night mode" and enable various debug options. It is also possible to change an animals name from its stats page.'
+                text:   'You can spawn food by tapping on the screen. By tapping on a specific animal, you show/hide its name and energy status. Animal stats can be accessed from the "Info" menu. You can also access the "Settings" page from there where you can activate the "Night mode", adjust the food spawn rate and enable various debug options. It is also possible to change an animals name from its stats page.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -153,13 +153,13 @@ Page {
             }
 
             // Coming when it's ready :)
-            /*
+
             SectionHeader {
                 text: "Multiplayer"
             }
 
             Label {
-                text:   'There are plans for an update that introduces a sort-of multiplayer option which will hopefully be released in early 2015. Once finished, you will be able to invite moose from your friends phone/tablet over to yours and let them play together. These non-local moose won\'t be able to mate with your moose.'
+                text:   'You can invite moose from your friends phone/tablet over to yours and let them play together by selecting the \'Upload\' option on an animals About page. Enter the 5 digit code you receive after uploading the animal on the host device to invite it.. Guest animals can\'t mate with local moose and changes (age, death) of guest animals are not synced back to their home device. A (g) behind the animals name indicates that it is a guest animal. Guest animals can be \'sent home\' from their stats page.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -168,7 +168,7 @@ Page {
                     leftMargin: Theme.paddingMedium
                     rightMargin: Theme.paddingMedium
                 }
-            }*/
+            }
 
             SectionHeader {
                 text: "Debug Mode"
@@ -176,6 +176,22 @@ Page {
 
             Label {
                 text:   'You can activate debug mode from the \'Info\' page. When activated, you can manually spawn/kill animals and the simulation won\'t spawn new animals automatically.'
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+            SectionHeader {
+                text: "Feature requests & Contribution"
+            }
+
+            Label {
+                text:   'A list of all requested features can be found in the github repo. If you would like to add something, just open an issue on github, write me an email or comment in the harbour. If you would like to contribute to pixl, feel free to fork the code on github and add the features you\'d like to have. If you don\'t have any ideas, take a look at the list mentioned above and pick something you like. Thanks!'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {

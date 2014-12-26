@@ -101,6 +101,21 @@ Page {
             page.foodspawn = 85; // Use default if DB value is not set
         }
 
+        // Remove removed guest moose
+        for(var i = 0; i < page.animals.length; i++){
+          if(!page.animals[i].local){
+            if(!DB.checknonlocal(page.animals[i].dna)){
+                // If moose has been sent home, remove moose
+                page.animals[i].destroy();
+                page.animals.splice(i, 1);
+                i--;
+            }
+          }
+        }
+        // Add new guest moose
+        // TODO
+
+
     }
 
     // Makes the start text blink
