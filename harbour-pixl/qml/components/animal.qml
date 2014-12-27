@@ -132,7 +132,7 @@ Image {
         }
 
         // Look for food
-        if(Math.floor(Math.random()*20) == 10 || searching){ // Look for food aprox. every 20 ticks
+        if((Math.floor(Math.random()*20) == 10 || searching) && Math.round((energy / maxenergy)*100) < 91){ // Look for food aprox. every 20 ticks (if energy is below 91%)
             var dist;
 
             // Check for food within viewarea
@@ -190,8 +190,11 @@ Image {
                             moving = false;
                             page.animals[i].moving = false;
 
-                            // Mate with 1/10 probability if both animals are local, age over 20 , matable and not already mating
-                            if(page.animals[i].mateable && mateable && !still && !page.animals[i].still && local && page.animals[i].local && age >= grownupage*400 && page.animals[i].age >= grownupage*400 && Math.floor(Math.random()*10) === 1){
+                            // Mate with certain probability based on energy if both animals are local, age over 20 , matable and not already mating
+                            var currentenergya = energy / maxenergy;
+                            var currentenergyb = page.animals[i].energy / page.animals[i].maxenergy;
+                            var multplicator = (1/currentenergya * 1/currentenergyb)*5; // 5 if both animals have 100%, higher if animals are hungry
+                            if(page.animals[i].mateable && mateable && !still && !page.animals[i].still && local && page.animals[i].local && age >= grownupage*400 && page.animals[i].age >= grownupage*400 && Math.floor(Math.random()*multplicator) === 1){
 
                                 // Align faces
                                 if(page.animals[i].x > x){
