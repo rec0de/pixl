@@ -73,6 +73,7 @@ Image {
     property string name: 'Mr. Moose'
     property string dna: ''
     property int age: 0
+    property int id
 
     Image {
         id: shadow
@@ -369,7 +370,10 @@ Image {
 
         // Slow down old animals
         if(page.slowdown && age > 400*slowdownage){
-            speed = speed * (400*slowdownage)/age;
+            var agesquared = age*age;
+            var constant = 0.94*400*slowdownage;
+            var multiplier = (constant*constant)/agesquared;
+            speed = speed * multiplier; // speed * (0.94 * 400 * slowndownage )^2/age^2
         }
 
         // Determine absolute value of xspeed and yspeed first

@@ -24,7 +24,7 @@ Item {
     Timer {
         id: despawner
         interval: (manual ? 40000 : 20000)
-        running: true
+        running: ticker.running
         repeat: false
         onTriggered: parent.despawn()
     }

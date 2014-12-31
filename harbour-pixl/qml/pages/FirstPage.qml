@@ -17,13 +17,42 @@ Page {
     Component.onCompleted: {
         DB.initialize();
 
+        // Update DB if necessary
+        if(!DB.getsett(5) > 1){
+
+            console.log('Updating existing moose to new DB...')
+
+            var guestupdatedata = DB.getnonlocal();
+            var updatedata = DB.getall();
+
+            DB.updateid();
+
+            // Add IDs to existing animals
+            if(updatedata !== false){
+                for(var i = 0; i < updatedata.length; i++){
+                    DB.addid(updatedata[i].dna, i);
+                }
+            }
+
+            // Add IDs to existing nonlocal animals
+            if(guestupdatedata !== false){
+                for(var j = 0; j < updatedata.length; j++){
+                    DB.addid(updatedata[j].dna, j);
+                }
+            }
+
+            DB.setsett(6, i+1); // Set next id
+            DB.setsett(7, j+1); // Set next id for nonlocal animals
+            DB.setsett(5, 2);
+        }
+
         // Load local animals from DB
         var data = DB.getall();
         var animal_comp = Qt.createComponent("../components/animal.qml");
 
         if(data != false){
             for(var i = 0; i < data.length; i++){
-                var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: data[i].name, age: data[i].age});
+                var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: data[i].name, age: data[i].age, id: data[i].id});
                 temp.importfromdna(data[i].dna);
                 temp.tick(); // Move animal to target coords
                 page.animals.push(temp);
@@ -35,7 +64,7 @@ Page {
 
         if(data != false){
             for(i = 0; i < data.length; i++){
-                temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: data[i].name, age: data[i].age, local: false});
+                temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: data[i].name, age: data[i].age, id: data[i].id,local: false});
                 temp.importfromdna(data[i].dna);
                 temp.tick(); // Move animal to target coords
                 page.animals.push(temp);
@@ -104,7 +133,7 @@ Page {
         // Remove removed guest moose
         for(var i = 0; i < page.animals.length; i++){
           if(!page.animals[i].local){
-            if(!DB.checknonlocal(page.animals[i].dna)){
+            if(!DB.checknonlocal(page.animals[i].id)){
                 // If moose has been sent home, remove moose
                 page.animals[i].destroy();
                 page.animals.splice(i, 1);
@@ -173,10 +202,10 @@ Page {
         // Save all animals to DB
         for(var i = 0; i < page.animals.length; i++){
             if(page.animals[i].local){
-                DB.addset(page.animals[i].dna, page.animals[i].name, page.animals[i].age);
+                DB.addset(page.animals[i].dna, page.animals[i].name, page.animals[i].age, page.animals[i].id);
             }
             else{
-                DB.addnonlocal(page.animals[i].dna, page.animals[i].name, page.animals[i].age);
+                DB.addnonlocal(page.animals[i].dna, page.animals[i].name, page.animals[i].age, page.animals[i].id);
             }
         }
     }
@@ -192,7 +221,7 @@ Page {
             // Update animal names
             for(var i = 0; i < page.animals.length; i++){
                 if(page.animals[i].local){
-                    page.animals[i].name = DB.getname(page.animals[i].dna);
+                    page.animals[i].name = DB.getname(page.animals[i].id);
                 }
             }
 
@@ -252,10 +281,10 @@ Page {
             }
             else{ // Remove dead animals
                 if(animals[i].local){
-                    DB.deleterow(animals[i].dna);
+                    DB.deleterow(animals[i].id);
                 }
                 else{
-                    DB.delnonlocal(animals[i].dna);
+                    DB.delnonlocal(animals[i].id);
                 }
 
                 animals.splice(i, 1);
@@ -289,18 +318,28 @@ Page {
 
     function spawnanimal(){
         var dna = randna();
+        var id = DB.getsett(6); // Get new unique id
+        if(id === '-1'){
+            id = 0;
+        }
         var animal_comp = Qt.createComponent("../components/animal.qml");
         // Moose spawned by simulation spawn at age 18 to reduce time to mating
-        var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*(page.height-60)+60), age: 18*400});
+        var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*(page.height-60)+60), age: 18*400, id: id});
         temp.importfromdna(dna);
         page.animals.push(temp);
+        DB.setsett(6, id+1); // Increment nextid
     }
 
     function createanimal(dna, x, y){
         var animal_comp = Qt.createComponent("../components/animal.qml");
-        var temp = animal_comp.createObject(page, {x: x, absy: y});
+        var id = DB.getsett(6); // Get new unique id
+        if(id === '-1'){
+            id = 0;
+        }
+        var temp = animal_comp.createObject(page, {x: x, absy: y, id: id});
         temp.importfromdna(dna);
         page.animals.push(temp);
+        DB.setsett(6, id+1); // Increment nextid
     }
 
     function randna(){

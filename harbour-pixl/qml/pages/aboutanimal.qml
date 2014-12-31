@@ -8,11 +8,21 @@ Page {
     property string name
     property bool local
     property int age
+    property int id
     property var specieslist: new Array('Common Moose', 'Dark Moose', 'Red Moose', 'Beige Moose')
     property int species
+    property bool debug
 
     Component.onCompleted: {
         DB.initialize();
+
+        // Check for debug mode
+        if(DB.getsett(1) == 1){
+            page.debug = true;
+        }
+        else{
+            page.debug = false;
+        }
 
         var dna = page.dna;
         var basepath = '../img/moose';
@@ -159,7 +169,7 @@ Page {
                     var dialog = pageStack.push("../components/dialog.qml", {"name": page.name})
                     dialog.accepted.connect(function() {
                         page.name = dialog.name;
-                        DB.addset(page.dna, page.name, page.age);
+                        DB.addset(page.dna, page.name, page.age, page.id);
                     })
                 }
             }
@@ -169,7 +179,7 @@ Page {
                 visible: !page.local
                 text: "Send home"
                 onClicked: {
-                    DB.delnonlocal(page.dna) // Remove non-local animal
+                    DB.delnonlocal(page.id) // Remove non-local animal
                 }
             }
         }
@@ -237,6 +247,39 @@ Page {
                 text: pers2()
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+
+            SectionHeader {
+                text: "Debug"
+                visible: page.debug
+            }
+
+            Label {
+                text: 'ID: '+page.id
+                visible: page.debug
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+            Label {
+                text: 'DNA: '+ parseInt(dna, 2).toString(16); // Base16 representation of DNA
+                visible: page.debug
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+
         }
     }
 

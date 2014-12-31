@@ -7,6 +7,8 @@ If you'd like to add an idea or feature request, open a github issue, write me a
 ## Planned (by me) features
 Invite-a-moose / 'Multiplayer' (done)
 
+Display debug info on animal stats page (done)
+
 Social interaction
 
 Better stats / character traits
@@ -22,22 +24,36 @@ Fix: Font has no umlauts (done)
 
 Avoid eating food if not hungry (done)
 
-Adjust mating probabiity (done)
+Adjust mating probability (done)
 
 Make hungry moose less likely to mate (done)
+
+Fix food despawning if paused (done)
+
+Adjust age slowdown (done)
+
+Fix duplicate DNA bug (probably done)
 
 Ancestors on 'About animal' page (planned)
 
 Day-Night cycle (planned)
 
-Adjust age slowdown (planned)
+Set upper population limit to avoid lag (planned)
+
+Improve food visibility
+
+More stats
 
 Seasons
 
 More social interaction
 
-Display character traits on main screen
+Display character traits on main screen / 'Selection' mode
 
 Quick access to 'About animal' page 
 
 Control food distribution
+
+Fix mating/energy reset on restart
+
+Add predators / other death causes

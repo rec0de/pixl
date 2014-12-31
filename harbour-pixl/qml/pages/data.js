@@ -9,6 +9,9 @@
 // 2   Age Slowdown (Default on)
 // 3   Food spawn rate (Deafult: 85)
 // 4   First upload? (Default: true)
+// 5   Version (Default: 0) Used to trigger one-time update code
+// 6   Next Id (Default: 0)
+// 7   Next Id for nonlocal (Default: 0)
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {
@@ -21,19 +24,28 @@ function initialize() {
     var db = getDatabase();
     db.transaction(
                 function(tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS animals (dna TEXT UNIQUE, name TEXT, age INTEGER)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS animals (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS settings (uid INTEGER UNIQUE, value INTEGER)');
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT UNIQUE, name TEXT, age INTEGER)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                 });
 }
 
+// Update database to include id column
+function updateid() {
+    var db = getDatabase();
+    db.transaction(
+                function(tx) {
+                    tx.executeSql('ALTER TABLE animals ADD id INTEGER UNIQUE');
+                    tx.executeSql('ALTER TABLE nonlocal ADD id INTEGER UNIQUE');
+                });
+}
 
-// This function is used to add or update animals
-function addset(dna, name, age) {
+// Add ID  to old DB rows
+function addid(dna, id) {
     var db = getDatabase();
     var res = "";
     db.transaction(function(tx) {
-        var rs = tx.executeSql('INSERT OR REPLACE INTO animals VALUES (?,?,?);', [dna,name,age]);
+        var rs = tx.executeSql("UPDATE animals SET id = '"+id+"' WHERE dna = '"+dna+"'");
         if (rs.rowsAffected > 0) {
             res = "OK";
         } else {
@@ -45,11 +57,29 @@ function addset(dna, name, age) {
     return res;
 }
 
-function addnonlocal(dna, name, age) {
+
+// This function is used to add or update animals
+function addset(dna, name, age, id) {
     var db = getDatabase();
     var res = "";
     db.transaction(function(tx) {
-        var rs = tx.executeSql('INSERT OR REPLACE INTO nonlocal VALUES (?,?,?);', [dna,name,age]);
+        var rs = tx.executeSql('INSERT OR REPLACE INTO animals VALUES (?,?,?,?);', [dna,name,age,id]);
+        if (rs.rowsAffected > 0) {
+            res = "OK";
+        } else {
+            res = "Error";
+            console.log ("Error saving to database");
+        }
+    }
+    );
+    return res;
+}
+
+function addnonlocal(dna, name, age, id) {
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('INSERT OR REPLACE INTO nonlocal VALUES (?,?,?,?);', [dna,name,age,id]);
         if (rs.rowsAffected > 0) {
             res = "OK";
         } else {
@@ -63,11 +93,11 @@ function addnonlocal(dna, name, age) {
 
 
 // This function is used to retrieve animal names from the database
-function getname(dna) {
+function getname(id) {
     var db = getDatabase();
     var res = '';
     db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT name, age FROM animals WHERE dna=?;', [dna]);
+        var rs = tx.executeSql('SELECT name, age FROM animals WHERE id=?;', [id]);
         if (rs.rows.length > 0) {
             res = rs.rows.item(0).name;
         } else {
@@ -82,7 +112,7 @@ function getall() {
     var db = getDatabase();
     var res;
     db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT dna, name, age FROM animals');
+        var rs = tx.executeSql('SELECT id, dna, name, age FROM animals');
         if (rs.rows.length > 0) {
             //console.log('Loading ' + rs.rows.length + 'animals from db');
             res = rs.rows;
@@ -97,7 +127,7 @@ function getnonlocal() {
     var db = getDatabase();
     var res;
     db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT dna, name, age FROM nonlocal');
+        var rs = tx.executeSql('SELECT id, dna, name, age FROM nonlocal');
         if (rs.rows.length > 0) {
             //console.log('Loading ' + rs.rows.length + 'animals from db');
             res = rs.rows;
@@ -109,11 +139,11 @@ function getnonlocal() {
 }
 
 // Checks if a guest moose is still in DB
-function checknonlocal(dna) {
+function checknonlocal(id) {
     var db = getDatabase();
     var res;
     db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT name FROM nonlocal WHERE dna=?', [dna]);
+        var rs = tx.executeSql('SELECT name FROM nonlocal WHERE id=?', [id]);
         if (rs.rows.length > 0) {
             res = true; // Moose is still there
         } else {
@@ -125,17 +155,17 @@ function checknonlocal(dna) {
 
 
 // This function is used to remove dead animals
-function deleterow(dna){
+function deleterow(id){
     var db = getDatabase();
     db.transaction(function(tx) {
-        var rs = tx.executeSql('DELETE FROM animals WHERE dna=?;', [dna]);
+        var rs = tx.executeSql('DELETE FROM animals WHERE id=?;', [id]);
     })
 }
 
-function delnonlocal(dna){
+function delnonlocal(id){
     var db = getDatabase();
     db.transaction(function(tx) {
-        var rs = tx.executeSql('DELETE FROM nonlocal WHERE dna=?;', [dna]);
+        var rs = tx.executeSql('DELETE FROM nonlocal WHERE id=?;', [id]);
     })
 }
 

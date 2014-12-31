@@ -21,14 +21,14 @@ Page {
         page.animals = DB.getall();
 
         for(var i = 0; i < page.animals.length; i++){
-            animalModel.append({"name": page.animals[i].name, "age": page.animals[i].age, "dna": page.animals[i].dna, "animal": true, "local": true})
+            animalModel.append({"name": page.animals[i].name, "age": page.animals[i].age, "dna": page.animals[i].dna, "animal": true, "local": true, "id": page.animals[i].id})
         }
 
         // List non-local animals
         page.guests = DB.getnonlocal();
 
         for(var i = 0; i < page.guests.length; i++){
-            animalModel.append({"name": page.guests[i].name, "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
+            animalModel.append({"name": page.guests[i].name, "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false, "id": page.guests[i].id})
         }
 
 
@@ -45,14 +45,14 @@ Page {
         animalModel.clear();
 
         for(var i = 0; i < page.animals.length; i++){
-            animalModel.append({"name": page.animals[i].name, "age": page.animals[i].age, "dna": page.animals[i].dna, "animal": true, "local": true})
+            animalModel.append({"name": page.animals[i].name, "age": page.animals[i].age, "dna": page.animals[i].dna, "animal": true, "local": true, "id": page.animals[i].id})
         }
 
         // List non-local animals
         page.guests = DB.getnonlocal();
 
         for(var i = 0; i < page.guests.length; i++){
-            animalModel.append({"name": page.guests[i].name, "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false})
+            animalModel.append({"name": page.guests[i].name, "age": page.guests[i].age, "dna": page.guests[i].dna, "animal": true, "local": false, "id": page.guests[i].id})
         }
 
         // Invite animal element
@@ -148,7 +148,7 @@ Page {
 
             onClicked:{
                 if(animal){
-                  pageStack.push(Qt.resolvedUrl("aboutanimal.qml"), {name: name, dna: dna, age: age, local: local});
+                  pageStack.push(Qt.resolvedUrl("aboutanimal.qml"), {name: name, dna: dna, age: age, local: local, id: id});
                 }
                 else{
                     pageStack.push(Qt.resolvedUrl("invite.qml"))
