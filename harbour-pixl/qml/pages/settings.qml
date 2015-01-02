@@ -7,7 +7,13 @@ Page {
 
     Component.onCompleted: {
         if(DB.getsett(0) == 1){
-            nightmode.checked = true;
+            daytime.currentIndex = 1;
+        }
+        else if(DB.getsett(0) == 0){
+            daytime.currentIndex = 0;
+        }
+        else{
+            daytime.currentIndex = 2;
         }
 
         if(DB.getsett(1) == 1){
@@ -26,16 +32,8 @@ Page {
         }
     }
 
-    function switchnight(){
-        var night = DB.getsett(0);
-        if(night != 1){
-            DB.setsett(0, 1); // Activate Night Mode
-            nightmode.checked = true;
-        }
-        else{
-            DB.setsett(0, 0); // Deactivate Night Mode
-            nightmode.checked = false;
-        }
+    function updatedaytime(){
+        DB.setsett(0, daytime.currentIndex);
     }
 
     function switchdebug(){
@@ -92,17 +90,6 @@ Page {
             }
 
             TextSwitch {
-                id: nightmode
-                text: "Night mode"
-                description: "Darker, eye friendly theme"
-                automaticCheck: false
-                checked: false
-                onClicked: {
-                    switchnight()
-                }
-            }
-
-            TextSwitch {
                 id: slowage
                 text: "High age slowdown"
                 description: "Makes old animals slower"
@@ -111,6 +98,18 @@ Page {
                 onClicked: {
                     switchslowage()
                 }
+            }
+
+            ComboBox {
+                label: "Daytime"
+                id: daytime
+
+                menu: ContextMenu {
+                    MenuItem { text: "Day" }
+                    MenuItem { text: "Night" }
+                    MenuItem { text: "Cycle" }
+                }
+                onCurrentIndexChanged: updatedaytime();
             }
 
             Slider {

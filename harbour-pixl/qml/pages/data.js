@@ -4,7 +4,7 @@
 // Code derived from 'Noto' by leszek -- Thanks :)
 
 // Structure of settings table
-// 0   Night Mode (Default off)
+// 0   Night Mode (Default 2) {0: day 1: night 2: cycle}
 // 1   Debug Mode (Default off)
 // 2   Age Slowdown (Default on)
 // 3   Food spawn rate (Deafult: 85)

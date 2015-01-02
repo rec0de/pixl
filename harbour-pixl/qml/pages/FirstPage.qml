@@ -10,9 +10,10 @@ Page {
     property var animals: new Array()
     property var food: new Array()
     property var hearts: new Array()
-    property bool debug: false //Display debug tools and disable automatic animal spawning
+    property bool debug: false // Display debug tools and disable automatic animal spawning
     property bool slowdown: true // Enables/Disables age based animal slowdown
     property int foodspawn: 85 // Food spawn probability (per tick)
+    property bool daynight: false // Activates day/night cycle
 
     Component.onCompleted: {
         DB.initialize();
@@ -101,9 +102,13 @@ Page {
             rect.color = '#334613';
             pond.source = "../img/pond_night.png";
         }
-        else{
+        else if(DB.getsett(0) == 0){
             rect.color = '#84b331';
             pond.source = "../img/pond_day.png";
+        }
+        else{
+            timecycle();
+            page.daynight = true;
         }
 
         // Update debug mode
@@ -428,7 +433,7 @@ Page {
     Timer {
         id: timecycler
         interval: 10000
-        running: Qt.ApplicationActive
+        running: Qt.ApplicationActive && page.daynight
         repeat: true
         onTriggered: timecycle()
     }
