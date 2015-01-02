@@ -38,9 +38,30 @@ Page {
                         if(id === '-1'){
                             id = 0;
                         }
-                        DB.addnonlocal(array[2], array[0], array[1], id);
-                        DB.setsett(7, id+1);
-                        updatemessage('Imported '+array[0]);
+
+                        // Count animals
+                        if(DB.getall !== false && DB.getnonlocal() !== false){
+                            var count = DB.getall().length + DB.getnonlocal().length;
+                        }
+                        else if(DB.getall !== false){
+                            count = DB.getall().length;
+                        }
+                        else if(DB.getnonlocal() !== false){
+                            count = DB.getnonlocal().length;
+                        }
+                        else{
+                            count = 0;
+                        }
+
+                        // Upper limit for population
+                        if(count < 51){
+                            DB.addnonlocal(array[2], array[0], array[1], id);
+                            DB.setsett(7, id+1);
+                            updatemessage('Imported '+array[0]);
+                        }
+                        else{
+                            updatemessage('Error: Too many moose. ('+count+')')
+                        }
                     }
                 }
                 else {

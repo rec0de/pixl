@@ -32,13 +32,13 @@ Fix food despawning if paused (done)
 
 Adjust age slowdown (done)
 
+Set upper population limit to avoid lag (done)
+
 Fix duplicate DNA bug (probably done)
 
 Ancestors on 'About animal' page (planned)
 
 Day-Night cycle (planned)
-
-Set upper population limit to avoid lag (planned)
 
 Improve food visibility
 
