@@ -19,28 +19,34 @@ Page {
         DB.initialize();
 
         // Update DB if necessary
-        if(!DB.getsett(5) > 1){
+        if(DB.getsett(5) < 2 || DB.getsett(5) === -1){
 
-            console.log('Updating existing moose to new DB...')
+            console.log('Updating existing moose to new DB...');
 
-            var guestupdatedata = DB.getnonlocal();
-            var updatedata = DB.getall();
+            var guestupdatedata = DB.oldnonlocal();
+            var updatedata = DB.oldall();
+
+            console.log('Saved existing animals to memory');
 
             DB.updateid();
 
-            // Add IDs to existing animals
+            console.log('Regenerated DB');
+
+            // Save animals to new DB
             if(updatedata !== false){
                 for(var i = 0; i < updatedata.length; i++){
-                    DB.addid(updatedata[i].dna, i);
+                    DB.addset(updatedata[i].dna, updatedata[i].name, updatedata[i].age, i);
                 }
             }
 
             // Add IDs to existing nonlocal animals
             if(guestupdatedata !== false){
-                for(var j = 0; j < updatedata.length; j++){
-                    DB.addid(updatedata[j].dna, j);
+                for(var j = 0; j < guestupdatedata.length; j++){
+                    DB.addnonlocal(guestupdatedata[j].dna, guestupdatedata[j].name, guestupdatedata[j].age, j);
                 }
             }
+
+            console.log('Imported animals, done.');
 
             DB.setsett(6, i+1); // Set next id
             DB.setsett(7, j+1); // Set next id for nonlocal animals

@@ -24,37 +24,52 @@ function initialize() {
     var db = getDatabase();
     db.transaction(
                 function(tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS animals (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS animals (dna TEXT, name TEXT, age INTEGER)');  // , id INTEGER UNIQUE
                     tx.executeSql('CREATE TABLE IF NOT EXISTS settings (uid INTEGER UNIQUE, value INTEGER)');
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER)');// , id INTEGER UNIQUE
                 });
 }
 
-// Update database to include id column
+// Regenerate database to include id column
 function updateid() {
     var db = getDatabase();
     db.transaction(
                 function(tx) {
-                    tx.executeSql('ALTER TABLE animals ADD id INTEGER UNIQUE');
-                    tx.executeSql('ALTER TABLE nonlocal ADD id INTEGER UNIQUE');
+                    tx.executeSql('DROP TABLE animals');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS animals (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
+                    tx.executeSql('DROP TABLE nonlocal');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                 });
+    console.log('Updated DB');
 }
 
-// Add ID  to old DB rows
-function addid(dna, id) {
+// Get animals from old DB
+function oldall() {
     var db = getDatabase();
-    var res = "";
+    var res;
     db.transaction(function(tx) {
-        var rs = tx.executeSql("UPDATE animals SET id = '"+id+"' WHERE dna = '"+dna+"'");
-        if (rs.rowsAffected > 0) {
-            res = "OK";
+        var rs = tx.executeSql('SELECT dna, name, age FROM animals');
+        if (rs.rows.length > 0) {
+            res = rs.rows;
         } else {
-            res = "Error";
-            console.log ("Error saving to database");
+            res = false;
         }
-    }
-    );
-    return res;
+    })
+    return res
+}
+
+function oldnonlocal() {
+    var db = getDatabase();
+    var res;
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT dna, name, age FROM nonlocal');
+        if (rs.rows.length > 0) {
+            res = rs.rows;
+        } else {
+            res = false;
+        }
+    })
+    return res
 }
 
 
@@ -196,7 +211,7 @@ function getsett(uid) {
         if (rs.rows.length > 0) {
             res = rs.rows.item(0).value
         } else {
-            res = "-1";
+            res = -1;
             //console.log ("Error reading settings from DB");
         }
     })
