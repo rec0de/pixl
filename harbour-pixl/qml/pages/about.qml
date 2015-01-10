@@ -105,16 +105,6 @@ Page {
 
         PullDownMenu {
             id: pullDownMenu
-            MenuItem {
-                id: resetMenuAction
-                text: "Reset Game"
-                onClicked: {
-                    var dialog = pageStack.push("../components/dialog_reset.qml")
-                    dialog.accepted.connect(function() {
-                      remorse.execute('Reset Game');
-                    })
-                }
-            }
 
             MenuItem {
                 id: aboutMenuAction

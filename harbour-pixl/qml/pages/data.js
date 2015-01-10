@@ -24,9 +24,9 @@ function initialize() {
     var db = getDatabase();
     db.transaction(
                 function(tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS animals (dna TEXT, name TEXT, age INTEGER)');  // , id INTEGER UNIQUE
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS animals (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS settings (uid INTEGER UNIQUE, value INTEGER)');
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER)');// , id INTEGER UNIQUE
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                 });
 }
 

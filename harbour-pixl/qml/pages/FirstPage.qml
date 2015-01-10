@@ -21,16 +21,10 @@ Page {
         // Update DB if necessary
         if(DB.getsett(5) < 2 || DB.getsett(5) === -1){
 
-            console.log('Updating existing moose to new DB...');
-
             var guestupdatedata = DB.oldnonlocal();
             var updatedata = DB.oldall();
 
-            console.log('Saved existing animals to memory');
-
             DB.updateid();
-
-            console.log('Regenerated DB');
 
             // Save animals to new DB
             if(updatedata !== false){
@@ -45,8 +39,6 @@ Page {
                     DB.addnonlocal(guestupdatedata[j].dna, guestupdatedata[j].name, guestupdatedata[j].age, j);
                 }
             }
-
-            console.log('Imported animals, done.');
 
             DB.setsett(6, i+1); // Set next id
             DB.setsett(7, j+1); // Set next id for nonlocal animals

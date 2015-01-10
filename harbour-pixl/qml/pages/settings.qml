@@ -130,6 +130,11 @@ Page {
                 text: "Debug"
             }
 
+            RemorsePopup {
+                id: remorse
+                onTriggered: DB.hardreset()
+            }
+
             TextSwitch {
                 id: debug
                 text: "Debug mode"
@@ -139,6 +144,17 @@ Page {
                 onClicked: {
                     switchdebug()
                 }
+            }
+
+            Button {
+               text: "Reset Game"
+               anchors.horizontalCenter: parent.horizontalCenter
+               onClicked:{
+                   var dialog = pageStack.push("../components/dialog_reset.qml")
+                   dialog.accepted.connect(function() {
+                    remorse.execute('Reset Game');
+                   })
+               }
             }
 
         }
