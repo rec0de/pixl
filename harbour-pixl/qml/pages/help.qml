@@ -43,7 +43,7 @@ Page {
             }
 
             Label {
-                text:   'You can spawn food by tapping on the screen. By tapping on a specific animal, you show/hide its name and energy status. Animal stats can be accessed from the "Info" menu. You can also access the "Settings" page from there where you can activate the "Night mode", adjust the food spawn rate and enable various debug options. It is also possible to change an animals name from its stats page.'
+                text:   'You can spawn food by tapping on the screen. By tapping on a specific animal, you show/hide its name and energy status. If the game is paused, this will also show additional info on the bottom of the screen. Tapping on this info will take you to the animals stats page. Animal stats can be accessed from the "Info" menu. You can also access the "Settings" page from there where you can activate the "Night mode", adjust the food spawn rate and enable various debug options. It is also possible to change an animals name from its stats page.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -93,6 +93,22 @@ Page {
 
             Label {
                 text:   'When two grown up (age > 20) animals stand next to each other, there is a chance that they will mate and create a new animal. The new animals DNA is a combination of the parents DNA. After an animal has mated, it can\'t mate again for ~5 minutes.'
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+            SectionHeader {
+                text: "Ancestors"
+            }
+
+            Label {
+                text:   'You can see an animals parents on the animals stats page. A grey moose icon indicates that that animal was spawned artificially or in an early verion of pixl without ancestry logging. You can tap on the two icons to get to the stats page of the parents. This version of the stats page lacks the age and rename/upload actions but will still be accessible once the parent animal is dead.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
