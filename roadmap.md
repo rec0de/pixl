@@ -34,11 +34,15 @@ Adjust age slowdown (done)
 
 Set upper population limit to avoid lag (done)
 
-Fix duplicate DNA bug (probably done)
+Fix duplicate DNA bug (done)
 
-Ancestors on 'About animal' page (planned)
+Day-Night cycle (done)
 
-Day-Night cycle (planned)
+Quick access to 'About animal' page (done)
+
+Ancestors on 'About animal' page (done)
+
+Display character traits on main screen / 'Selection' mode (in progress)
 
 Improve food visibility
 
@@ -48,12 +52,16 @@ Seasons
 
 More social interaction
 
-Display character traits on main screen / 'Selection' mode
-
-Quick access to 'About animal' page 
-
 Control food distribution
 
 Fix mating/energy reset on restart
 
 Add predators / other death causes
+
+Add event log
+
+Make hunger gradual
+
+Improve animal movement
+
+Adjust food rate depending on season

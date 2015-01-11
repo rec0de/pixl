@@ -27,6 +27,7 @@ function initialize() {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS animals (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS settings (uid INTEGER UNIQUE, value INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ancestors (dna TEXT, name TEXT, parenta INTEGER, parentb INTEGER, id INTEGER UNIQUE)');
                 });
 }
 
@@ -83,7 +84,7 @@ function addset(dna, name, age, id) {
             res = "OK";
         } else {
             res = "Error";
-            console.log ("Error saving to database");
+            console.log ("Error saving to animal database");
         }
     }
     );
@@ -99,7 +100,7 @@ function addnonlocal(dna, name, age, id) {
             res = "OK";
         } else {
             res = "Error";
-            console.log ("Error saving to database");
+            console.log ("Error saving to nonlocal database");
         }
     }
     );
@@ -216,6 +217,84 @@ function getsett(uid) {
         }
     })
     return res;
+}
+
+// This adds animal data to the permanent ancestors log
+function ancestors_add(dna, name, id, parenta, parentb) {
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('INSERT OR REPLACE INTO ancestors VALUES (?,?,?,?,?);', [dna,name,parenta,parentb,id]);
+        if (rs.rowsAffected > 0) {
+            res = "OK";
+        } else {
+            res = "Error";
+            console.log ("Error saving to ancestors database");
+        }
+    }
+    );
+    return res;
+}
+
+// This changes the name of an animal in the DB
+function ancestors_rename(id, newname) {
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('UPDATE ancestors SET name = ? WHERE id = ?', [newname, id]);
+        if (rs.rowsAffected > 0) {
+            res = "OK";
+        } else {
+            res = "Error";
+            console.log ("Error updating ancestors database");
+        }
+    }
+    );
+    return res;
+}
+
+// Returns animals name and dna
+function ancestors_getdata(id) {
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT name, dna, id FROM ancestors WHERE id = ?', [id]);
+        if (rs.rowsAffected > 0) {
+            res = rs.rows.item(0);
+        } else {
+            res = false;
+            console.log ("Error reading from ancestors database");
+        }
+    }
+    );
+    return res;
+}
+
+// Returns an animals parents dna & names (unfinished)
+function ancestors_get(id) {
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT parenta, parentb FROM ancestors WHERE id = ?', [id]);
+        if (rs.rowsAffected > 0) {
+            res = rs.rows.item(0);
+        } else {
+            res = false;
+            console.log ("Error reading from ancestors database");
+        }
+    }
+    );
+    if(res.parenta === -1 || res.parentb === -1){
+        var parents = new Array('None', '0', 'None', '0', '0', '0');
+    }
+    else{
+        var parenta = ancestors_getdata(res.parenta);
+        var parentb = ancestors_getdata(res.parentb);
+        var parents = new Array(parenta.name, parenta.dna, parentb.name, parentb.dna, parenta.id, parentb.id);
+    }
+
+
+    return parents;
 }
 
 // This function resets the game

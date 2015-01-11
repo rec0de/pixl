@@ -221,7 +221,7 @@ Image {
                                 page.animals[i].startstill = true; // Apparently I cannot start the timer from here, so I set a var which gets checked by the other animal in tick()
 
                                 // Spawn new animal
-                                createanimal(combinedna(dna, page.animals[i].dna), x + Math.floor(Math.random()*10), y + Math.floor(Math.random()*10));
+                                createanimal(combinedna(dna, page.animals[i].dna), x + Math.floor(Math.random()*10), y + Math.floor(Math.random()*10), animal.id, page.animals[i].id);
                                 console.log('Spawning');
                                 mateable = false;
                                 page.animals[i].mateable = false;
@@ -346,7 +346,18 @@ Image {
     }
 
     function showname(){
+        // Toggle nametag
         name.visible = !name.visible;
+        if(page.paused){
+            // Display animal info
+            animalstats.a_name = animal.name;
+            animalstats.a_dna = animal.dna;
+            animalstats.a_age = animal.age;
+            animalstats.a_local = animal.local;
+            animalstats.a_id = animal.id;
+            animalstats.a_energy = Math.round((animal.energy / animal.maxenergy)*100) + '%';
+            animalstats.visible = true;
+        }
     }
 
     function xytodirection(ox, oy){

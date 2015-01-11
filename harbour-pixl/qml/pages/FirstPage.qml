@@ -14,6 +14,7 @@ Page {
     property bool slowdown: true // Enables/Disables age based animal slowdown
     property int foodspawn: 85 // Food spawn probability (per tick)
     property bool daynight: false // Activates day/night cycle
+    property bool paused: true // Game is paused
 
     Component.onCompleted: {
         DB.initialize();
@@ -24,18 +25,23 @@ Page {
             var guestupdatedata = DB.oldnonlocal();
             var updatedata = DB.oldall();
 
+            var i = -1; // Sets id to 0 if no animals are moved
+            var j = -1;
+
             DB.updateid();
+
 
             // Save animals to new DB
             if(updatedata !== false){
-                for(var i = 0; i < updatedata.length; i++){
+                for(i = 0; i < updatedata.length; i++){
                     DB.addset(updatedata[i].dna, updatedata[i].name, updatedata[i].age, i);
+                    DB.ancestors_add(updatedata[i].dna, updatedata[i].name, i, -1, -1) // Add ancestor entry with unknown parents
                 }
             }
 
             // Add IDs to existing nonlocal animals
             if(guestupdatedata !== false){
-                for(var j = 0; j < guestupdatedata.length; j++){
+                for(j = 0; j < guestupdatedata.length; j++){
                     DB.addnonlocal(guestupdatedata[j].dna, guestupdatedata[j].name, guestupdatedata[j].age, j);
                 }
             }
@@ -199,6 +205,7 @@ Page {
         saver.running = false;
         start.visible = true;
         start.text = 'tap to resume'
+        page.paused = true;
     }
 
     function backup() {
@@ -229,6 +236,8 @@ Page {
             }
 
             // Start Timers & reset labels
+            page.paused = false;
+            animalstats.visible = false;
             blinker.running = false;
             ticker.running = true;
             cleaner.running = true;
@@ -331,9 +340,10 @@ Page {
         temp.importfromdna(dna);
         page.animals.push(temp);
         DB.setsett(6, id+1); // Increment nextid
+        DB.ancestors_add(dna, 'Mr. Moose', id, -1, -1) // Add ancestor entry with unknown parents
     }
 
-    function createanimal(dna, x, y){
+    function createanimal(dna, x, y, parenta, parentb){
         var animal_comp = Qt.createComponent("../components/animal.qml");
         var id = DB.getsett(6); // Get new unique id
         if(id === '-1'){
@@ -343,6 +353,7 @@ Page {
         temp.importfromdna(dna);
         page.animals.push(temp);
         DB.setsett(6, id+1); // Increment nextid
+        DB.ancestors_add(dna, 'Mr. Moose', id, parenta, parentb) // Add ancestor entry given parents
     }
 
     function randna(){
@@ -552,6 +563,64 @@ Page {
                     anchors.fill: parent
                     onClicked: help()
                 }
+            }
+        }
+    }
+
+    Rectangle{
+        id: animalstats
+        visible: false
+        y: rect.height - 95
+        x: -5
+        color: rect.color
+        height: 100
+        width: rect.width + 10
+        border.color: '#ffffff'
+        border.width: 5
+        property string a_name
+        property string a_dna
+        property string a_energy
+        property int a_age
+        property bool a_local
+        property int a_id
+        MouseArea {
+            anchors.fill: parent
+            onClicked: pageStack.push(Qt.resolvedUrl("aboutanimal.qml"), {name: parent.a_name, dna: parent.a_dna, age: parent.a_age, local: parent.a_local, id: parent.a_id});
+        }
+        Column{
+            width: parent.width / 2
+            anchors.left: parent.left
+
+            Label {
+                text: animalstats.a_name
+                font.pixelSize: 24
+                font.family: pixels.name
+                anchors.leftMargin: -10
+            }
+            Label {
+                text: 'Age: ' + Math.round(animalstats.a_age/400)
+                font.pixelSize: 24
+                font.family: pixels.name
+            }
+            Label {
+                text: 'Energy: ' + animalstats.a_energy
+                font.pixelSize: 24
+                font.family: pixels.name
+            }
+        }
+        Column{
+            width: parent.width / 2
+            anchors.right: parent.right
+
+            Label {
+                text: 'Hyperactive'
+                font.pixelSize: 24
+                font.family: pixels.name
+            }
+            Label {
+                text: 'Lazy'
+                font.pixelSize: 24
+                font.family: pixels.name
             }
         }
     }
