@@ -42,7 +42,15 @@ Quick access to 'About animal' page (done)
 
 Ancestors on 'About animal' page (done)
 
-Display character traits on main screen / 'Selection' mode (in progress)
+Display character traits on main screen / 'Selection' mode (done)
+
+Add event log (planned)
+
+Make hunger gradual (planned)
+
+Add predators / other death causes
+
+Improve animal movement
 
 Improve food visibility
 
@@ -55,13 +63,5 @@ More social interaction
 Control food distribution
 
 Fix mating/energy reset on restart
-
-Add predators / other death causes
-
-Add event log
-
-Make hunger gradual
-
-Improve animal movement
 
 Adjust food rate depending on season

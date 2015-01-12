@@ -570,13 +570,11 @@ Page {
     Rectangle{
         id: animalstats
         visible: false
-        y: rect.height - 95
-        x: -5
+        y: rect.height - 90
+        x: 0
         color: rect.color
-        height: 100
-        width: rect.width + 10
-        border.color: '#ffffff'
-        border.width: 5
+        height: 90
+        width: rect.width
         property string a_name
         property string a_dna
         property string a_energy
@@ -587,15 +585,22 @@ Page {
             anchors.fill: parent
             onClicked: pageStack.push(Qt.resolvedUrl("aboutanimal.qml"), {name: parent.a_name, dna: parent.a_dna, age: parent.a_age, local: parent.a_local, id: parent.a_id});
         }
+
+        onA_dnaChanged: {
+            charactera.text = pers1(a_dna);
+            characterb.text = pers2(a_dna)
+        }
+
         Column{
             width: parent.width / 2
             anchors.left: parent.left
+            anchors.leftMargin: 15
+            anchors.topMargin: 15
 
             Label {
                 text: animalstats.a_name
                 font.pixelSize: 24
                 font.family: pixels.name
-                anchors.leftMargin: -10
             }
             Label {
                 text: 'Age: ' + Math.round(animalstats.a_age/400)
@@ -611,18 +616,76 @@ Page {
         Column{
             width: parent.width / 2
             anchors.right: parent.right
+            anchors.topMargin: 15
 
             Label {
-                text: 'Hyperactive'
+                id: charactera
+                text: 'Unknown'
                 font.pixelSize: 24
                 font.family: pixels.name
             }
             Label {
-                text: 'Lazy'
+                id: characterb
+                text: 'Unknown'
                 font.pixelSize: 24
                 font.family: pixels.name
             }
         }
+    }
+
+    // 'Border' for animal info
+    Rectangle{
+        visible: animalstats.visible
+        y: rect.height - 95
+        height: 5
+        width: parent.width
+        color: '#ffffff'
+    }
+
+    // Character trait calculation for animal info
+    function pers1(dna){
+        var energystill = 0.001 + parseInt(dna.substr(20, 3), 2)/2000;
+        var minspeed = 0.5 + parseInt(dna.substr(27, 3), 2)/2;
+        var maxspeed = minspeed + parseInt(dna.substr(30, 3), 2)/1.5
+        var energymoving = energystill * (1 + maxspeed / 10) * (1 + parseInt(dna.substr(24, 4), 2)/15)
+        var maxenergy = 4 + parseInt(dna.substr(17, 3), 2);
+
+        var hungry = (1 + energystill*200)*(1 + energymoving*200) - (maxspeed/5);
+        var fast = (maxspeed - minspeed);
+        var untiring = (1 / hungry)*(maxenergy/2);
+
+        if(hungry > fast && hungry > untiring){
+            return 'Hungry';
+        }
+        else if(fast >= hungry && fast >= untiring){
+            return 'Fast';
+        }
+        else{
+            return 'Untiring';
+        }
+    }
+
+    function pers2(dna){
+        var viewarea = 70 + parseInt(dna.substr(4, 3), 2) * 15;
+        var movingchange = 1 + parseInt(dna.substr(7, 3), 2);
+        var stillchange = 1 + parseInt(dna.substr(10, 3), 2);
+        var directionchange = parseInt(dna.substr(13, 4), 2);
+        var searchingduration = 300 + parseInt(dna.substr(36, 4), 2)*100;
+
+        var lazy = (stillchange - movingchange)*3;
+        var clever = (viewarea / 25) * (searchingduration / 250);
+        var hyperactive = (1 + movingchange)*(1 + (directionchange / 3)) - stillchange;
+
+        if(lazy > clever && lazy > hyperactive){
+            return 'Lazy';
+        }
+        else if(clever >= lazy && clever >= hyperactive){
+            return 'Clever';
+        }
+        else{
+            return 'Hyperactive';
+        }
+
     }
 
 
@@ -666,7 +729,7 @@ Page {
               anchors.fill: parent
               onClicked: {
                   // Upper limit to avoid critical lag
-                  if(page.animals.length < 51){
+                  if(page.animals.length < 31){
                     spawnanimal()
                   }
               }

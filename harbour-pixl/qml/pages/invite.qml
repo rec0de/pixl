@@ -54,7 +54,7 @@ Page {
                         }
 
                         // Upper limit for population
-                        if(count < 51){
+                        if(count < 31){
                             DB.addnonlocal(array[2], array[0], array[1], id);
                             DB.setsett(7, id+1);
                             updatemessage('Imported '+array[0]);
