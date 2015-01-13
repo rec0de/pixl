@@ -105,10 +105,12 @@ Page {
         if(DB.getsett(0) == 1){
             rect.color = '#334613';
             pond.source = "../img/pond_night.png";
+            page.daynight = false;
         }
         else if(DB.getsett(0) == 0){
             rect.color = '#84b331';
             pond.source = "../img/pond_day.png";
+            page.daynight = false;
         }
         else{
             timecycle();
@@ -373,37 +375,39 @@ Page {
 
     // Adjusts background color relative to current time
     function timecycle(){
-        var currentTime = new Date ( );
+        if(page.daynight){
+            var currentTime = new Date ( );
 
-        var currentHours = currentTime.getHours();
-        var currentMinutes = currentTime.getMinutes();
-        var currentSeconds = currentTime.getSeconds();
+            var currentHours = currentTime.getHours();
+            var currentMinutes = currentTime.getMinutes();
+            var currentSeconds = currentTime.getSeconds();
 
-        // Get seconds from midnight
-        var midnight = (currentHours*60*60)+(currentMinutes*60)+currentSeconds; // Between 0 and 86640
+            // Get seconds from midnight
+            var midnight = (currentHours*60*60)+(currentMinutes*60)+currentSeconds; // Between 0 and 86640
 
-        // Replace pond graphic if needed
-        if(midnight < 18000 || midnight > 66000){
-            pond.source = '../img/pond_night.png';
+            // Replace pond graphic if needed
+            if(midnight < 18000 || midnight > 66000){
+                pond.source = '../img/pond_night.png';
+            }
+            else{
+                pond.source = '../img/pond_day.png';
+            }
+
+            // Calculate multiplicator
+            var mult = Math.abs(Math.sin(midnight * (Math.PI/86640)))*0.8 + 0.2;
+
+            // Calculate color shade
+            var r = 132; // Base color
+            var g = 179;
+            var b = 49;
+
+            var r2 = Math.floor(r * mult);
+            var g2 = Math.floor(g * mult);
+            var b2 = Math.floor(b * mult);
+
+            var color = (r2 < 16 ? "0" : "" ) + r2.toString(16) + (g2 < 16 ? "0" : "" ) + g2.toString(16) + (b2 < 16 ? "0" : "" ) + b2.toString(16);
+            rect.color = '#' + color;
         }
-        else{
-            pond.source = '../img/pond_day.png';
-        }
-
-        // Calculate multiplicator
-        var mult = Math.abs(Math.sin(midnight * (Math.PI/86640)))*0.8 + 0.2;
-
-        // Calculate color shade
-        var r = 132; // Base color
-        var g = 179;
-        var b = 49;
-
-        var r2 = Math.floor(r * mult);
-        var g2 = Math.floor(g * mult);
-        var b2 = Math.floor(b * mult);
-
-        var color = (r2 < 16 ? "0" : "" ) + r2.toString(16) + (g2 < 16 ? "0" : "" ) + g2.toString(16) + (b2 < 16 ? "0" : "" ) + b2.toString(16);
-        rect.color = '#' + color;
     }
 
 
