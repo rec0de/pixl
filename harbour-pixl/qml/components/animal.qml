@@ -80,10 +80,10 @@ Image {
         source: "../img/moose_shadow.png"
         mirror: parent.mirror
         opacity: .5
-        width: 45
+        width: parent.width
         height: 10
         x: 0
-        y: 40 + parent.sshift
+        y: parent.height - 5 + parent.sshift
         z: 0
     }
 
@@ -106,6 +106,17 @@ Image {
 
         // Increment age
         age = age + 1;
+
+        // Adjust size if age < 19 * 400
+        if(age < 19*400){
+            var factor = Math.sqrt(age/400 + 0.2)*0.08 + 0.65;
+            animal.height = Math.round(factor * 45);
+            animal.width = Math.round(factor * 45);
+        }
+        else{
+            animal.width = 45;
+            animal.height = 45;
+        }
 
         // Check for stillreset signal
         if(startstill){

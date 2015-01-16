@@ -298,12 +298,21 @@ function ancestors_get(id) {
 }
 
 // This function resets the game
+function clearnonlocal(){
+    var db = getDatabase();
+    db.transaction(function(tx) {
+        tx.executeSql('DROP TABLE nonlocal;');
+        tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
+    })
+}
+
+// This function resets the game
 function hardreset(){
     var db = getDatabase();
     db.transaction(function(tx) {
-        var rs = tx.executeSql('DROP TABLE animals;');
-        rs = tx.executeSql('DROP TABLE settings;');
-        rs = tx.executeSql('DROP TABLE nonlocal;');
+        tx.executeSql('DROP TABLE animals;');
+        tx.executeSql('DROP TABLE settings;');
+        tx.executeSql('DROP TABLE nonlocal;');
     })
 }
 

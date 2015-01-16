@@ -51,6 +51,14 @@ Page {
             DB.setsett(5, 2);
         }
 
+
+        // Reset guest DB to clear corrupted moose after update
+        if(DB.getsett(5) < 3 || DB.getsett(5) === -1){
+            DB.clearnonlocal();
+            DB.setsett(5, 3);
+        }
+
+
         // Load local animals from DB
         var data = DB.getall();
         var animal_comp = Qt.createComponent("../components/animal.qml");
@@ -274,7 +282,7 @@ Page {
         // Spawn food
         if(Math.floor(Math.random()*page.foodspawn) == 1){
             var x = Math.floor(Math.random()*(page.width-30));
-            var y = Math.floor(Math.random()*(page.height-70))+60;
+            var y = Math.floor(Math.random()*(page.height-90))+60;
             var food_comp = Qt.createComponent("../components/food.qml");
             var temp = food_comp.createObject(page, {x: x, y: y});
             page.food.push(temp);

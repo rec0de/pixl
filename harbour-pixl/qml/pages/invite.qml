@@ -12,6 +12,11 @@ Page {
     }
 
     function load(code) {
+        if(code === ''){
+            updatemessage('Error: Please enter code');
+            return
+        }
+
         var url = 'https://cdown.pf-control.de/pixl/getanimal.php?code='+code; // alias domain for rec0de.net with valid SSL cert
 
         var xhr = new XMLHttpRequest();
