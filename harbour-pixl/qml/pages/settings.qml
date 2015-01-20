@@ -135,6 +135,11 @@ Page {
                 onTriggered: DB.hardreset()
             }
 
+            RemorsePopup {
+                id: remorse2
+                onTriggered: DB.log_clear()
+            }
+
             TextSwitch {
                 id: debug
                 text: "Debug mode"
@@ -144,6 +149,14 @@ Page {
                 onClicked: {
                     switchdebug()
                 }
+            }
+
+            Button {
+               text: "Reset Log"
+               anchors.horizontalCenter: parent.horizontalCenter
+               onClicked:{
+                    remorse2.execute('Reset Log');
+               }
             }
 
             Button {

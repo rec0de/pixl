@@ -44,11 +44,17 @@ Ancestors on 'About animal' page (done)
 
 Display character traits on main screen / 'Selection' mode (done)
 
-Add event log (planned)
+Fix food distribution (done)
 
-Make hunger gradual (planned)
+Show age on ancestor view (done)
 
-Add predators / other death causes
+Make hunger gradual (done)
+
+Make old animals less likely to mate (done)
+
+Add event log (in progress)
+
+Add predators / other death causes (planned)
 
 Improve animal movement
 

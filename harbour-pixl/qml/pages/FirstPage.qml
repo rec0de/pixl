@@ -58,6 +58,12 @@ Page {
             DB.setsett(5, 3);
         }
 
+        // Log starting message on first startup or after update
+        if(DB.getsett(5) < 4 || DB.getsett(5) === -1){
+            log('firststart', false, false);
+            DB.setsett(5, 4);
+        }
+
 
         // Load local animals from DB
         var data = DB.getall();
@@ -290,7 +296,16 @@ Page {
 
         // Spawn 3 animals on startup
         if(page.animals.length < 3 && !page.debug){
-            spawnanimal();
+            // Spawn and log only once if there are no moose
+            if(page.animals.length === 0){
+                log('spawnthree', false, false);
+                spawnanimal(false);
+                spawnanimal(false);
+                spawnanimal(false);
+            }
+            else{
+                spawnanimal(true);
+            }
         }
 
 
@@ -338,7 +353,7 @@ Page {
         }
     }
 
-    function spawnanimal(){
+    function spawnanimal(writelog){
         var dna = randna();
         var id = DB.getsett(6); // Get new unique id
         if(id === '-1'){
@@ -351,7 +366,11 @@ Page {
         page.animals.push(temp);
         DB.setsett(6, id+1); // Increment nextid
         DB.ancestors_add(dna, 'Mr. Moose', id, -1, -1) // Add ancestor entry with unknown parents
+        if(writelog){
+            log('spawn', 'Mr. Moose', dna); // Log spawning
+        }
     }
+
 
     function createanimal(dna, x, y, parenta, parentb){
         var animal_comp = Qt.createComponent("../components/animal.qml");
@@ -364,6 +383,7 @@ Page {
         page.animals.push(temp);
         DB.setsett(6, id+1); // Increment nextid
         DB.ancestors_add(dna, 'Mr. Moose', id, parenta, parentb) // Add ancestor entry given parents
+         log('birth', 'Mr. Moose', dna); // Log birth
     }
 
     function randna(){
@@ -395,11 +415,22 @@ Page {
 
             // Replace pond graphic if needed
             if(midnight < 18000 || midnight > 66000){
+                // If state has changed from day to night, log sundown
+                if(timecycler.prevtime !== -1 && (!(timecycler.prevtime < 18000 || timecycler.prevtime > 66000))){
+                    log('sundown', false, false);
+                }
                 pond.source = '../img/pond_night.png';
             }
             else{
+                // If state has changed from day to night, log sunrise
+                if(timecycler.prevtime !== -1 && (timecycler.prevtime < 18000 || timecycler.prevtime > 66000)){
+                    log('sunrise', false, false);
+                }
                 pond.source = '../img/pond_day.png';
             }
+
+            // Set prevtime
+            timecycler.prevtime = midnight;
 
             // Calculate multiplicator
             var mult = Math.abs(Math.sin(midnight * (Math.PI/86640)))*0.8 + 0.2;
@@ -416,6 +447,52 @@ Page {
             var color = (r2 < 16 ? "0" : "" ) + r2.toString(16) + (g2 < 16 ? "0" : "" ) + g2.toString(16) + (b2 < 16 ? "0" : "" ) + b2.toString(16);
             rect.color = '#' + color;
         }
+    }
+
+    // Contains log texts for various events
+    function log(event, name, dna){
+        var texts = new Array();
+        var colorlist = new Array('brown', 'dark', 'red', 'beige');
+
+        if(dna !== false){
+            var color = colorlist[parseInt(dna.substr(2, 2), 2)];
+        }
+
+        if(event === 'spawn'){
+            texts = ['A new moose enters the clearing. His '+color+' fur is ruffeled.', 'A young moose walks out of the deep forest surrounding the clearing.', 'A moose emerges from the bushes that surround the glade. He\'s new here.', 'A new moose appears on the glade. Where did he come from?', 'A strange sound comes out of the bushes. It\'s a '+color+' moose. You haven\'t seen him here before.'];
+        }
+        else if(event === 'starving'){
+            texts = [name + ' is starving, barely able to keep walking.', name+' is hungering, desperately trying to find food. ', name+' is desperately looking for something edible.'];
+        }
+        else if(event === 'birth'){
+            texts = ['A new moose is born. He looks cute with his huge dark eyes and '+color+' fur.'];
+        }
+        else if(event === 'death'){
+            texts = [name + ' collapses on the ground as he breathes for one last time.', 'A corpse lies on the ground, nothing but skin and bone. It\'s '+name+'.', name+' looks at you for the last time. His big eyes close, slowly. He\'s dead. You know it.', name+' staggers towards you, his '+color+' fur is tattered. He collapses in front of you. You know he won\'t stand up again.'];
+        }
+        else if(event === 'sunrise'){
+            texts = ['The sun rises slowly above the treetops. A new day begins.', 'A fresh morning breeze blows trough the grass as the sun begins to rise.', 'Small dewdrops form in the tall grass as the sun rises above the trees.'];
+        }
+        else if(event === 'sundown'){
+            texts = ['The descending sun paints the sky deep orange. The night is about to begin.', 'The sun is setting. It\'s getting darker around.', 'Slowly, the sun disappears behind a high fir. The night is coming.'];
+        }
+        else if(event === 'spawnthree'){
+            texts = ['Three moose are standing in front of you. They look friendly.', 'You look around. There, near the edge of the glade, you see three moose.', 'In the high grass you can see three moose eating flowers. They look calm.', 'You can see three moose walking around on the clearing, probably searching food.'];
+        }
+        else if(event === 'firststart'){
+            texts = ['Your story begins on a small clearing in a dark forest.', 'This is where it all starts. A small clearing in the woods.', 'This is the beginning of your story. A small glade in the endless forest.'];
+        }
+
+        // Choose random text & save to log
+        var index = Math.floor(Math.random()*texts.length);
+        DB.log_add(texts[index]);
+        updatelogmsg(texts[index]);
+    }
+
+    // Shows & updates text of log message
+    function updatelogmsg(text){
+        msgtext.text = text;
+        logmsg.visible = true;
     }
 
 
@@ -457,6 +534,7 @@ Page {
         running: Qt.ApplicationActive && page.daynight
         repeat: true
         onTriggered: timecycle()
+        property int prevtime: -1
     }
 
     Rectangle {
@@ -538,6 +616,15 @@ Page {
             onClicked: options()
         }
 
+        Label {
+            y: 5
+            id: logo
+            text: 'Menu'
+            font.pixelSize: 42
+            font.family: pixels.name
+            anchors.horizontalCenter: menu.horizontalCenter
+        }
+
         Rectangle{
             id: menu2
             visible: false
@@ -578,6 +665,37 @@ Page {
             }
         }
     }
+
+    Rectangle{
+        id: logmsg
+        visible: false
+        y: -5
+        x: -5
+        color: rect.color
+        height: 75
+        width: rect.width + 10
+        border.color: '#ffffff'
+        border.width: 5
+        MouseArea {
+            anchors.fill: parent
+            onClicked: parent.visible = false
+        }
+        Label {
+            id: msgtext
+            visible: parent.visible
+            text: 'unknown'
+            font.pixelSize: 21
+            font.family: pixels.name
+            wrapMode: Text.WordWrap
+            anchors {
+                left: parent.left
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+                leftMargin: Theme.paddingMedium
+                rightMargin: Theme.paddingMedium
+            }
+        }
+     }
 
     Rectangle{
         id: animalstats
@@ -742,20 +860,10 @@ Page {
               onClicked: {
                   // Upper limit to avoid critical lag
                   if(page.animals.length < 31){
-                    spawnanimal()
+                    spawnanimal(true)
                   }
               }
            }
         }
-    }
-
-
-    Label {
-        y: 5
-        id: logo
-        text: 'Menu'
-        font.pixelSize: 42
-        font.family: pixels.name
-        anchors.horizontalCenter: menu.horizontalCenter
     }
 }

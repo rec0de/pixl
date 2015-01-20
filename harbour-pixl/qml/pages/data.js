@@ -12,6 +12,7 @@
 // 5   Version (Default: 0) Used to trigger one-time update code
 // 6   Next Id (Default: 0)
 // 7   Next Id for nonlocal (Default: 0)
+// 8   Next ID for log
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {
@@ -28,6 +29,7 @@ function initialize() {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS settings (uid INTEGER UNIQUE, value INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ancestors (dna TEXT, name TEXT, parenta INTEGER, parentb INTEGER, id INTEGER UNIQUE)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT)');
                 });
 }
 
@@ -113,11 +115,26 @@ function getname(id) {
     var db = getDatabase();
     var res = '';
     db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT name, age FROM animals WHERE id=?;', [id]);
+        var rs = tx.executeSql('SELECT name FROM animals WHERE id=?;', [id]);
         if (rs.rows.length > 0) {
             res = rs.rows.item(0).name;
         } else {
             res = '-1';
+        }
+    })
+    return res
+}
+
+// This function is used to retrieve animal ages from the database
+function getage(id) {
+    var db = getDatabase();
+    var res = '';
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT age FROM animals WHERE id=?;', [id]);
+        if (rs.rows.length > 0) {
+            res = rs.rows.item(0).age;
+        } else {
+            res = false;
         }
     })
     return res
@@ -297,6 +314,55 @@ function ancestors_get(id) {
     return parents;
 }
 
+// Adds data to event log
+function log_add(text){
+    var db = getDatabase();
+    var res = "";
+    var id = getsett(8) + 1;
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('INSERT INTO log VALUES (?,?);', [id, text]);
+        if (rs.rowsAffected > 0) {
+            res = "OK";
+        } else {
+            res = "Error";
+            console.log ("Error saving to log");
+        }
+    }
+    );
+    setsett(8, id);
+    return res;
+}
+
+// Returns complete event log
+function log_get(){
+    var db = getDatabase();
+    var res;
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT val FROM log');
+        if (rs.rows.length > 0) {
+            res = rs.rows;
+        } else {
+            res = false;
+        }
+    })
+    return res
+}
+
+// Clears log table
+function log_clear(){
+    var db = getDatabase();
+    var res;
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('DELETE FROM log');
+        if (rs.rows.length > 0) {
+            res = rs.rows;
+        } else {
+            res = false;
+        }
+    })
+    return res
+}
+
 // This function resets the game
 function clearnonlocal(){
     var db = getDatabase();
@@ -313,6 +379,7 @@ function hardreset(){
         tx.executeSql('DROP TABLE animals;');
         tx.executeSql('DROP TABLE settings;');
         tx.executeSql('DROP TABLE nonlocal;');
+        tx.executeSql('DROP TABLE log;');
     })
 }
 

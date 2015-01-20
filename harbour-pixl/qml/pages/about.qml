@@ -115,6 +115,14 @@ Page {
             }
 
             MenuItem {
+                id: logMenuAction
+                text: "Event Log"
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("logview.qml"))
+                }
+            }
+
+            MenuItem {
                 id: settingsMenuAction
                 text: "Settings"
                 onClicked: {

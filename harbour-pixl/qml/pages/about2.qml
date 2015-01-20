@@ -130,7 +130,7 @@ Page {
 
             Label {
                 id: body
-                text: 'Font by astramat.com<br>Database derived from \'noto\' by leszek. Thanks to all of you!'
+                text: 'Font by astramat.com<br>Database derived from \'noto\' by leszek.<br>Inspired by \'Disco Zoo\' and \'A dark room\'.<br> Thanks to all of you!'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {

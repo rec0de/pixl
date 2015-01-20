@@ -36,7 +36,8 @@ OTHER_FILES += qml/harbour-pixl.qml \
     qml/components/heart.qml \
     qml/pages/settings.qml \
     qml/components/dialog_firstupload.qml \
-    qml/pages/invite.qml
+    qml/pages/invite.qml \
+    qml/pages/logview.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line

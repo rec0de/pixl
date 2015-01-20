@@ -57,6 +57,16 @@ Page {
             parentimageb.source = '../img/moose' + (parseInt(parents[3].substr(2, 2), 2) + 1) + '.png';
         }
 
+        // Show age for ancestor view
+        if(page.ancestor){
+            if(DB.getage(page.id) !== false){
+                agetext.text = Math.round(DB.getage(id)/400);
+            }
+            else{
+                agetext.text = 'Deceased'
+            }
+        }
+
     }
 
     function pers1(){
@@ -254,13 +264,12 @@ Page {
 
             SectionHeader {
                 text: "Age"
-                visible: !page.ancestor
             }
 
             Label {
+                id: agetext
                 text: Math.floor(page.age/400)
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: !page.ancestor
             }
 
 

@@ -144,7 +144,8 @@ Image {
         }
 
         // Look for food
-        if((Math.floor(Math.random()*20) == 10 || searching) && Math.round((energy / maxenergy)*100) < 91){ // Look for food aprox. every 20 ticks (if energy is below 91%)
+        var searchprob = 0.12 * Math.pow(1.068, Math.round((energy / maxenergy)*100)) + 10; // Searching probability, depends on energy
+        if((Math.floor(Math.random()*searchprob) == 10 || searching) && Math.round((energy / maxenergy)*100) < 91){ // Look for food aprox. every 20 ticks (if energy is below 91%)
             var dist;
 
             // Check for food within viewarea
@@ -202,10 +203,10 @@ Image {
                             moving = false;
                             page.animals[i].moving = false;
 
-                            // Mate with certain probability based on energy if both animals are local, age over 20 , matable and not already mating
-                            var currentenergya = energy / maxenergy;
-                            var currentenergyb = page.animals[i].energy / page.animals[i].maxenergy;
-                            var multplicator = (1/currentenergya * 1/currentenergyb)*5; // 5 if both animals have 100%, higher if animals are hungry
+                            // Mate with certain probability based on energy and age if both animals are local, age over 20 , matable and not already mating
+                            var multa = 1/(energy / maxenergy)+ Math.pow(1.3,((age/400)-80));
+                            var multb = 1/(page.animals[i].energy / page.animals[i].maxenergy) + Math.pow(1.3,((page.animals[i].age/400)-80));
+                            var multplicator = (multa * multb)*5; // 5 if both animals have 100% and youger than 80, higher if animals are hungry
                             if(page.animals[i].mateable && mateable && !still && !page.animals[i].still && local && page.animals[i].local && age >= grownupage*400 && page.animals[i].age >= grownupage*400 && Math.floor(Math.random()*multplicator) === 1){
 
                                 // Align faces
@@ -240,7 +241,7 @@ Image {
                                 page.animals[i].startmate = true; // Apparently I cannot start the timer from here, so I set a var which gets checked by the other animal in tick()
                             }
                             else if(Math.floor(Math.random()*10) === 5){ // Otherwise play with other moose with 1/10 probability
-                                //TODO, planned for next release
+                                //TODO, planned for sometime
                             }
                         }
                         else{
@@ -329,6 +330,9 @@ Image {
         shadow.visible = false;
         alive = false;
 
+        // Log death
+        page.log('death', animal.name, animal.dna)
+
         destroy(8000);
     }
 
@@ -395,7 +399,7 @@ Image {
             var agesquared = age*age;
             var constant = 0.94*400*slowdownage;
             var multiplier = (constant*constant)/agesquared;
-            speed = speed * multiplier; // speed * (0.94 * 400 * slowndownage )^2/age^2
+            speed = speed * multiplier;
         }
 
         // Determine absolute value of xspeed and yspeed first
@@ -403,13 +407,13 @@ Image {
         var absy = speed - absx;
 
         // Determine if each value is negative / positive
-        if(Math.floor(Math.random()*2) == 0){
+        if(Math.floor(Math.random()*2) == 1){
             xspeed = - absx;
         }
         else{
             xspeed = absx;
         }
-        if(Math.floor(Math.random()*2) == 0){
+        if(Math.floor(Math.random()*2) == 1){
             yspeed = - absy;
         }
         else{
