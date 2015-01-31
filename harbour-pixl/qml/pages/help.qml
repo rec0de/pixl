@@ -70,13 +70,29 @@ Page {
                 }
             }
 
+            SectionHeader {
+                text: "Character traits"
+            }
+
+            Label {
+                text:   'Character traits are calculated from your animals DNA. The trait that matches best with the DNA will be displayed on the animals stats and quick info page. The value in brackets behind the trait represents the '
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
 
             SectionHeader {
                 text: "Food & Energy"
             }
 
             Label {
-                text:   'Your animals need food. A certain amount of food is spawned automatically at random locations, but you can also place food manually by tapping on the screen. Animals will notice food after a certain time in a certain area around them (if their energy level is below 91%) and eat it. By eating one food-item, the animal gains one energy unit. Animals generally consume more energy while they are moving, but the absolute energy consumption is unique to each animal.'
+                text:   'Your animals need food. A certain amount of food is spawned automatically at random locations, but you can also place food manually by tapping on the screen. Animals will notice food after a certain time in a certain area around them (if their energy level is below 91%) and eat it. Hungry animals tend to notice food quicker than sated ones. By eating one food-item, the animal gains one energy unit. Animals generally consume more energy while they are moving, but the absolute energy consumption is unique to each animal.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -92,7 +108,23 @@ Page {
             }
 
             Label {
-                text:   'When two grown up (age > 20) animals stand next to each other, there is a chance that they will mate and create a new animal. The new animals DNA is a combination of the parents DNA. After an animal has mated, it can\'t mate again for ~5 minutes.'
+                text:   'When two grown up (age > 20) animals stand next to each other, there is a chance that they will mate and create a new animal. This chance depends on both animals energy (higher is better) and age (lower is better). The new animals DNA is a combination of the parents DNA. After an animal has mated, it can\'t mate again for ~5 minutes.'
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+            SectionHeader {
+                text: "Gender"
+            }
+
+            Label {
+                text:   'There is no such thing as gender in this game. It\'s not just that the population is entirely male/female. The moose simply have no gender. However, in my opinion, only adressing moose in a gender-neutral way in the event messages hurts overall feeling of the game. Therefore, I decided to add an option on the rename dialog to define if the new name (not the moose itself) is female or male. This makes the event messages sound way better and does not influence anything else.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -108,7 +140,7 @@ Page {
             }
 
             Label {
-                text:   'You can see an animals parents on the animals stats page. A grey moose icon indicates that that animal was spawned artificially or in an early verion of pixl without ancestry logging. You can tap on the two icons to get to the stats page of the parents. This version of the stats page lacks the age and rename/upload actions but will still be accessible once the parent animal is dead.'
+                text:   'You can see an animals parents on the animals stats page. A grey moose icon indicates that that animal was spawned artificially or in an early verion of pixl without ancestry logging. You can tap on the two icons to get to the stats page of the parents. This version of the stats page lacks rename/upload actions but will still be accessible once the parent animal is dead.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -125,7 +157,7 @@ Page {
             }
 
             Label {
-                text:   'Once an animals age, which can be seen on its stats page, reaches 20, the animal is considered a grown up and is able to mate with other animals. When an animal reaches the age of 90, its movement speed will slowly decline making it harder for this animal to survive. This slowdown can be disabled in the settings menu.'
+                text:   'Once an animals age, which can be seen on its stats page, reaches 20, the animal is considered a grown up and is able to mate with other animals. When an animal reaches the age of 90, its movement speed will slowly decline making it harder for this animal to survive. From the age ~80 on, the mating probability of the animal will decrease drastically. This slowdown can be disabled in the settings menu.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {

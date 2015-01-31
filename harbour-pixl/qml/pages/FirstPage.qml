@@ -15,6 +15,7 @@ Page {
     property int foodspawn: 85 // Food spawn probability (per tick)
     property bool daynight: false // Activates day/night cycle
     property bool paused: true // Game is paused
+    property int playtime: 0 // Time played in seconds
 
     Component.onCompleted: {
         DB.initialize();
@@ -60,7 +61,7 @@ Page {
 
         // Log starting message on first startup or after update
         if(DB.getsett(5) < 4 || DB.getsett(5) === -1){
-            log('firststart', false, false);
+            log('firststart', false, false, false);
             DB.setsett(5, 4);
         }
 
@@ -108,6 +109,14 @@ Page {
 
         // Update other settings
         updatesettings();
+
+        // Log ambient message
+        if(pond.source == '../img/pond_night.png'){
+            log('ambient_night', false, false, false);
+        }
+        else{
+            log('ambient_day', false, false, false);
+        }
     }
 
     FontLoader { id: pixels; source: "../img/pixelmix.ttf" }
@@ -298,7 +307,7 @@ Page {
         if(page.animals.length < 3 && !page.debug){
             // Spawn and log only once if there are no moose
             if(page.animals.length === 0){
-                log('spawnthree', false, false);
+                log('spawnthree', false, false, false);
                 spawnanimal(false);
                 spawnanimal(false);
                 spawnanimal(false);
@@ -351,6 +360,10 @@ Page {
                 i--;
             }
         }
+
+        // Increment playtime
+        page.playtime = DB.getsett(9);
+        DB.setsett(9, playtime + 2);
     }
 
     function spawnanimal(writelog){
@@ -359,15 +372,16 @@ Page {
         if(id === '-1'){
             id = 0;
         }
+        var name = ranname();
         var animal_comp = Qt.createComponent("../components/animal.qml");
         // Moose spawned by simulation spawn at age 18 to reduce time to mating
-        var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*(page.height-60)+60), age: 18*400, id: id});
+        var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*(page.height-60)+60), age: 18*400, id: id, name: name});
         temp.importfromdna(dna);
         page.animals.push(temp);
         DB.setsett(6, id+1); // Increment nextid
-        DB.ancestors_add(dna, 'Mr. Moose', id, -1, -1) // Add ancestor entry with unknown parents
+        DB.ancestors_add(dna, name, id, -1, -1) // Add ancestor entry with unknown parents
         if(writelog){
-            log('spawn', 'Mr. Moose', dna); // Log spawning
+            log('spawn', name, dna, id); // Log spawning
         }
     }
 
@@ -378,12 +392,13 @@ Page {
         if(id === '-1'){
             id = 0;
         }
-        var temp = animal_comp.createObject(page, {x: x, absy: y, id: id});
+        var name = ranname();
+        var temp = animal_comp.createObject(page, {x: x, absy: y, id: id, name: name});
         temp.importfromdna(dna);
         page.animals.push(temp);
         DB.setsett(6, id+1); // Increment nextid
-        DB.ancestors_add(dna, 'Mr. Moose', id, parenta, parentb) // Add ancestor entry given parents
-         log('birth', 'Mr. Moose', dna); // Log birth
+        DB.ancestors_add(dna, name, id, parenta, parentb) // Add ancestor entry given parents
+         log('birth', name, dna, id); // Log birth
     }
 
     function randna(){
@@ -398,6 +413,15 @@ Page {
             }
         }
         return dna;
+    }
+
+    // returns random name
+    function ranname(){
+        var names = new Array();
+        // Moose in different languages
+        names = ['Elg', 'Eland', 'Poder', 'Hirvi', 'Elan', 'Elch', 'Elgur', 'Munsu', 'Eilc', 'Alce', 'Alces', 'Briedis', 'Atawhenua', 'Losi', 'Uncal', 'Älg', 'Elciaid'];
+        var index = Math.floor(Math.random()*names.length);
+        return names[index];
     }
 
 
@@ -417,14 +441,14 @@ Page {
             if(midnight < 18000 || midnight > 66000){
                 // If state has changed from day to night, log sundown
                 if(timecycler.prevtime !== -1 && (!(timecycler.prevtime < 18000 || timecycler.prevtime > 66000))){
-                    log('sundown', false, false);
+                    log('sundown', false, false, false);
                 }
                 pond.source = '../img/pond_night.png';
             }
             else{
                 // If state has changed from day to night, log sunrise
                 if(timecycler.prevtime !== -1 && (timecycler.prevtime < 18000 || timecycler.prevtime > 66000)){
-                    log('sunrise', false, false);
+                    log('sunrise', false, false, false);
                 }
                 pond.source = '../img/pond_day.png';
             }
@@ -449,26 +473,44 @@ Page {
         }
     }
 
+
     // Contains log texts for various events
-    function log(event, name, dna){
+    function log(event, name, dna, id){
         var texts = new Array();
         var colorlist = new Array('brown', 'dark', 'red', 'beige');
+        var namegender = DB.getnamegender(id);
+
+        var hisher = (namegender == 1 ? "her" : "his");
+        var himher = (namegender == 1 ? "her" : "him");
+        var heshe = (namegender == 1 ? "she" : "he");
+
+        // Capitalizes first letter
+        String.prototype.capitalize = function() {
+            return this.charAt(0).toUpperCase() + this.slice(1);
+        }
+
 
         if(dna !== false){
             var color = colorlist[parseInt(dna.substr(2, 2), 2)];
         }
 
         if(event === 'spawn'){
-            texts = ['A new moose enters the clearing. His '+color+' fur is ruffeled.', 'A young moose walks out of the deep forest surrounding the clearing.', 'A moose emerges from the bushes that surround the glade. He\'s new here.', 'A new moose appears on the glade. Where did he come from?', 'A strange sound comes out of the bushes. It\'s a '+color+' moose. You haven\'t seen him here before.'];
+            texts = ['A new moose enters the clearing. '+hisher.capitalize()+' '+color+' fur is ruffeled.', 'A young moose walks out of the deep forest surrounding the clearing.', 'A moose emerges from the bushes that surround the glade. '+heshe.capitalize()+'\'s new here.', 'A new moose appears on the glade. Where did '+heshe+' come from?', 'A strange sound comes out of the bushes. It\'s a '+color+' moose. You haven\'t seen '+himher+' here before.'];
         }
         else if(event === 'starving'){
             texts = [name + ' is starving, barely able to keep walking.', name+' is hungering, desperately trying to find food. ', name+' is desperately looking for something edible.'];
         }
         else if(event === 'birth'){
-            texts = ['A new moose is born. He looks cute with his huge dark eyes and '+color+' fur.'];
+            texts = ['A new moose is born. '+heshe.capitalize()+' looks cute with '+hisher+' huge dark eyes and '+color+' fur.'];
         }
         else if(event === 'death'){
-            texts = [name + ' collapses on the ground as he breathes for one last time.', 'A corpse lies on the ground, nothing but skin and bone. It\'s '+name+'.', name+' looks at you for the last time. His big eyes close, slowly. He\'s dead. You know it.', name+' staggers towards you, his '+color+' fur is tattered. He collapses in front of you. You know he won\'t stand up again.'];
+            texts = [name + ' collapses on the ground, breathing for one last time.', 'A corpse lies on the ground, nothing but skin and bone. It\'s '+name+'.', name+' looks at you for the last time. '+hisher.capitalize()+' big eyes close, slowly. '+heshe.capitalize()+'\'s dead. You know it.', name+' staggers towards you, '+hisher+' '+color+' fur is tattered. '+heshe.capitalize()+' collapses in front of you. You know '+heshe+' won\'t stand up again.'];
+        }
+        else if(event === 'ambient_day'){
+            texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.'];
+        }
+        else if(event === 'ambient_night'){
+            texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the ponds surface, swirling trough the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.'];
         }
         else if(event === 'sunrise'){
             texts = ['The sun rises slowly above the treetops. A new day begins.', 'A fresh morning breeze blows trough the grass as the sun begins to rise.', 'Small dewdrops form in the tall grass as the sun rises above the trees.'];
@@ -515,7 +557,7 @@ Page {
     Timer {
         id: cleaner
         interval: 2000
-        running: true
+        running: false
         repeat: true
         onTriggered: cleanup()
     }
@@ -667,12 +709,60 @@ Page {
     }
 
     Rectangle{
+        id: debug
+        visible: page.debug
+        y: 55
+        x: -5
+        color: 'transparent'
+        height: 65
+        width: rect.width + 10
+        border.color: '#ffffff'
+        border.width: 5
+
+        Label {
+           id: debug_bkill
+           text: 'Kill'
+           horizontalAlignment: Text.AlignHCenter
+           font.pixelSize: 42
+           font.family: pixels.name
+           anchors.verticalCenter: parent.verticalCenter
+           anchors.left: parent.left
+           width: parent.width/2
+           MouseArea {
+              anchors.fill: parent
+              onClicked: page.animals[0].energy = 0
+           }
+        }
+
+
+        Label {
+           id: debug_bspawn
+           text: 'Spawn'
+           horizontalAlignment: Text.AlignHCenter
+           font.pixelSize: 42
+           font.family: pixels.name
+           anchors.verticalCenter: parent.verticalCenter
+           anchors.right: parent.right
+           width: parent.width/2
+           MouseArea {
+              anchors.fill: parent
+              onClicked: {
+                  // Upper limit to avoid critical lag
+                  if(page.animals.length < 31){
+                    spawnanimal(true)
+                  }
+              }
+           }
+        }
+    }
+
+    Rectangle{
         id: logmsg
         visible: false
         y: -5
         x: -5
         color: rect.color
-        height: 75
+        height: msgtext.height + 30;
         width: rect.width + 10
         border.color: '#ffffff'
         border.width: 5
@@ -774,15 +864,15 @@ Page {
 
     // Character trait calculation for animal info
     function pers1(dna){
-        var energystill = 0.001 + parseInt(dna.substr(20, 3), 2)/2000;
-        var minspeed = 0.5 + parseInt(dna.substr(27, 3), 2)/2;
-        var maxspeed = minspeed + parseInt(dna.substr(30, 3), 2)/1.5
-        var energymoving = energystill * (1 + maxspeed / 10) * (1 + parseInt(dna.substr(24, 4), 2)/15)
-        var maxenergy = 4 + parseInt(dna.substr(17, 3), 2);
+        var energystill = parseInt(dna.substr(20, 3), 2)/8;
+        var minspeed = parseInt(dna.substr(27, 3), 2)/8;
+        var maxspeed = parseInt(dna.substr(30, 3), 2)/8;
+        var energymoving = parseInt(dna.substr(24, 4), 2)/16;
+        var maxenergy = parseInt(dna.substr(17, 3), 2)/8;
 
-        var hungry = (1 + energystill*200)*(1 + energymoving*200) - (maxspeed/5);
-        var fast = (maxspeed - minspeed);
-        var untiring = (1 / hungry)*(maxenergy/2);
+        var hungry = (1 + energystill)*(1 + energymoving) - maxspeed*1.2; // Between 0 and 4
+        var fast = (1 + minspeed)*(1 + maxspeed) - energymoving/2.4; // Between 0 and 4
+        var untiring = (2 - hungry/2)*(1+maxenergy); // Between 0 and 4
 
         if(hungry > fast && hungry > untiring){
             return 'Hungry';
@@ -796,15 +886,15 @@ Page {
     }
 
     function pers2(dna){
-        var viewarea = 70 + parseInt(dna.substr(4, 3), 2) * 15;
-        var movingchange = 1 + parseInt(dna.substr(7, 3), 2);
-        var stillchange = 1 + parseInt(dna.substr(10, 3), 2);
-        var directionchange = parseInt(dna.substr(13, 4), 2);
-        var searchingduration = 300 + parseInt(dna.substr(36, 4), 2)*100;
+        var viewarea = parseInt(dna.substr(4, 3), 2)/8;
+        var movingchange = parseInt(dna.substr(7, 3), 2)/8;
+        var stillchange = parseInt(dna.substr(10, 3), 2)/8;
+        var directionchange = parseInt(dna.substr(13, 4), 2)/16;
+        var searchingduration = parseInt(dna.substr(36, 4), 2)/16;
 
-        var lazy = (stillchange - movingchange)*3;
-        var clever = (viewarea / 25) * (searchingduration / 250);
-        var hyperactive = (1 + movingchange)*(1 + (directionchange / 3)) - stillchange;
+        var lazy = stillchange*4 - movingchange;
+        var clever = viewarea*2 + searchingduration*2;
+        var hyperactive = (1 + movingchange)*(1 + directionchange) - stillchange;
 
         if(lazy > clever && lazy > hyperactive){
             return 'Lazy';
@@ -816,54 +906,5 @@ Page {
             return 'Hyperactive';
         }
 
-    }
-
-
-    Rectangle{
-        id: debug
-        visible: page.debug
-        y: 55
-        x: -5
-        color: 'transparent'
-        height: 65
-        width: rect.width + 10
-        border.color: '#ffffff'
-        border.width: 5
-
-        Label {
-           id: debug_bkill
-           text: 'Kill'
-           horizontalAlignment: Text.AlignHCenter
-           font.pixelSize: 42
-           font.family: pixels.name
-           anchors.verticalCenter: parent.verticalCenter
-           anchors.left: parent.left
-           width: parent.width/2
-           MouseArea {
-              anchors.fill: parent
-              onClicked: page.animals[0].energy = 0
-           }
-        }
-
-
-        Label {
-           id: debug_bspawn
-           text: 'Spawn'
-           horizontalAlignment: Text.AlignHCenter
-           font.pixelSize: 42
-           font.family: pixels.name
-           anchors.verticalCenter: parent.verticalCenter
-           anchors.right: parent.right
-           width: parent.width/2
-           MouseArea {
-              anchors.fill: parent
-              onClicked: {
-                  // Upper limit to avoid critical lag
-                  if(page.animals.length < 31){
-                    spawnanimal(true)
-                  }
-              }
-           }
-        }
     }
 }

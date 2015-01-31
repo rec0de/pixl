@@ -9,10 +9,9 @@ Invite-a-moose / 'Multiplayer' (done)
 
 Display debug info on animal stats page (done)
 
+Better stats / character traits (done)
+
 Social interaction
-
-Better stats / character traits
-
 
 ## User-requested features
 
@@ -50,7 +49,11 @@ Show age on ancestor view (done)
 
 Make hunger gradual (done)
 
+Add random names (done)
+
 Make old animals less likely to mate (done)
+
+Fix mating reset on restart (probably done)
 
 Add event log (in progress)
 
@@ -58,16 +61,8 @@ Add predators / other death causes (planned)
 
 Improve animal movement
 
-Improve food visibility
-
 More stats
 
-Seasons
+Seasons -> Adjust food rate depending on season
 
 More social interaction
-
-Control food distribution
-
-Fix mating/energy reset on restart
-
-Adjust food rate depending on season

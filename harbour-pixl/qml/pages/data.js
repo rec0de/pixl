@@ -13,6 +13,7 @@
 // 6   Next Id (Default: 0)
 // 7   Next Id for nonlocal (Default: 0)
 // 8   Next ID for log
+// 9   Playtime in seconds
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {
@@ -30,6 +31,8 @@ function initialize() {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ancestors (dna TEXT, name TEXT, parenta INTEGER, parentb INTEGER, id INTEGER UNIQUE)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS namegender (id INTEGER UNIQUE, val INTEGER)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS matetime (id INTEGER UNIQUE, val INTEGER)');
                 });
 }
 
@@ -138,6 +141,72 @@ function getage(id) {
         }
     })
     return res
+}
+
+// This function is used to retrieve name gender from the database
+// 0 = male; 1 = female
+function getnamegender(id) {
+    var db = getDatabase();
+    var res = '';
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT val FROM namegender WHERE id=?;', [id]);
+        if (rs.rows.length > 0) {
+            res = rs.rows.item(0).val;
+            if(res != 1){
+                res = 0;
+            }
+        } else {
+            res = 0;
+        }
+    })
+    return res
+}
+
+function setnamegender(uid, value) {
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('INSERT OR REPLACE INTO namegender VALUES (?,?);', [uid,value]);
+        if (rs.rowsAffected > 0) {
+            res = "OK";
+        } else {
+            res = "Error";
+            console.log ("Error saving to database");
+        }
+    }
+    );
+    return res;
+}
+
+// This function is used to retrieve mate time from the database
+function getmatetime(id) {
+    var db = getDatabase();
+    var res = '';
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT val FROM matetime WHERE id=?;', [id]);
+        if (rs.rows.length > 0) {
+            res = rs.rows.item(0).val;
+        } else {
+            res = 0;
+        }
+    })
+    return res
+}
+
+function setmatetime(uid, value) {
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('INSERT OR REPLACE INTO matetime VALUES (?,?);', [uid,value]);
+        if (rs.rowsAffected > 0) {
+            res = "OK";
+        } else {
+            res = "Error";
+            console.log ("Error saving to database");
+        }
+    }
+    );
+    return res;
 }
 
 // This function is used to retrieve all animal datasets from the database
@@ -379,6 +448,7 @@ function hardreset(){
         tx.executeSql('DROP TABLE animals;');
         tx.executeSql('DROP TABLE settings;');
         tx.executeSql('DROP TABLE nonlocal;');
+        tx.executeSql('DROP TABLE namegender;');
         tx.executeSql('DROP TABLE log;');
     })
 }

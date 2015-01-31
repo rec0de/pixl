@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import '../pages/data.js' as DB
 
 // Animal DNA specs
 //
@@ -105,7 +106,7 @@ Image {
     function tick(){
 
         // Increment age
-        age = age + 1;
+        age++;
 
         // Adjust size if age < 19 * 400
         if(age < 19*400){
@@ -123,13 +124,6 @@ Image {
             startstill = false;
             stillreset.start();
         }
-
-        // Check for stillreset signal
-        if(startmate){
-            startmate = false;
-            matereset.start();
-        }
-
 
         y = absy - yshift;
         sshift = yshift;
@@ -204,10 +198,16 @@ Image {
                             page.animals[i].moving = false;
 
                             // Mate with certain probability based on energy and age if both animals are local, age over 20 , matable and not already mating
-                            var multa = 1/(energy / maxenergy)+ Math.pow(1.3,((age/400)-80));
+                            var multa = 1/(energy / maxenergy);
+                            if((age/400) > 81.5){
+                                multa += Math.log((age/400)-80) * 1.5;
+                            }
                             var multb = 1/(page.animals[i].energy / page.animals[i].maxenergy) + Math.pow(1.3,((page.animals[i].age/400)-80));
+                            if((page.animals[i].age/400) > 81.5){
+                                multb += Math.log((page.animals[i].age/400)-80) * 1.5;
+                            }
                             var multplicator = (multa * multb)*5; // 5 if both animals have 100% and youger than 80, higher if animals are hungry
-                            if(page.animals[i].mateable && mateable && !still && !page.animals[i].still && local && page.animals[i].local && age >= grownupage*400 && page.animals[i].age >= grownupage*400 && Math.floor(Math.random()*multplicator) === 1){
+                            if(!still && !page.animals[i].still && local && page.animals[i].local && age >= grownupage*400 && page.animals[i].age >= grownupage*400 && Math.floor(Math.random()*multplicator) === 1 && DB.getmatetime(id) < page.playtime && DB.getmatetime(page.animals[i].id) < page.playtime){
 
                                 // Align faces
                                 if(page.animals[i].x > x){
@@ -234,11 +234,10 @@ Image {
 
                                 // Spawn new animal
                                 createanimal(combinedna(dna, page.animals[i].dna), x + Math.floor(Math.random()*10), y + Math.floor(Math.random()*10), animal.id, page.animals[i].id);
-                                console.log('Spawning');
-                                mateable = false;
-                                page.animals[i].mateable = false;
-                                matereset.start();
-                                page.animals[i].startmate = true; // Apparently I cannot start the timer from here, so I set a var which gets checked by the other animal in tick()
+
+                                // Set matetime for both animals
+                                DB.setmatetime(id, page.playtime + 60*5);
+                                DB.setmatetime(page.animals[i].id, page.playtime + 60*5);
                             }
                             else if(Math.floor(Math.random()*10) === 5){ // Otherwise play with other moose with 1/10 probability
                                 //TODO, planned for sometime
@@ -331,7 +330,7 @@ Image {
         alive = false;
 
         // Log death
-        page.log('death', animal.name, animal.dna)
+        page.log('death', animal.name, animal.dna, animal.id)
 
         destroy(8000);
     }

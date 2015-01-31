@@ -6,9 +6,11 @@ Page {
     id: page
     property string dna
     property string name
+    property string newname
     property bool local
     property int age
     property int id
+    property int namegender
     property var specieslist: new Array('Common Moose', 'Dark Moose', 'Red Moose', 'Beige Moose')
     property int species
     property bool debug
@@ -71,49 +73,46 @@ Page {
 
     function pers1(){
         var dna = page.dna;
+        var energystill = parseInt(dna.substr(20, 3), 2)/8;
+        var minspeed = parseInt(dna.substr(27, 3), 2)/8;
+        var maxspeed = parseInt(dna.substr(30, 3), 2)/8;
+        var energymoving = parseInt(dna.substr(24, 4), 2)/16;
+        var maxenergy = parseInt(dna.substr(17, 3), 2)/8;
 
-        var energystill = 0.001 + parseInt(dna.substr(20, 3), 2)/2000;
-        var minspeed = 0.5 + parseInt(dna.substr(27, 3), 2)/2;
-        var maxspeed = minspeed + parseInt(dna.substr(30, 3), 2)/1.5
-        var energymoving = energystill * (1 + maxspeed / 10) * (1 + parseInt(dna.substr(24, 4), 2)/15)
-        var maxenergy = 4 + parseInt(dna.substr(17, 3), 2);
-
-        var hungry = (1 + energystill*200)*(1 + energymoving*200) - (maxspeed/5);
-        var fast = (maxspeed - minspeed);
-        var untiring = (1 / hungry)*(maxenergy/2);
+        var hungry = (1 + energystill)*(1 + energymoving) - maxspeed*1.2; // Between 0 and 4
+        var fast = (1 + minspeed)*(1 + maxspeed) - energymoving/2.4; // Between 0 and 4
+        var untiring = (2 - hungry/2)*(1+maxenergy); // Between 0 and 4
 
         if(hungry > fast && hungry > untiring){
-            return 'Hungry';
+            return 'Hungry ('+Math.round((hungry/4)*100)+'%)';
         }
         else if(fast >= hungry && fast >= untiring){
-            return 'Fast';
+            return 'Fast ('+Math.round((fast/4)*100)+'%)';
         }
         else{
-            return 'Untiring';
+            return 'Untiring ('+Math.round((untiring/4)*100)+'%)';
         }
     }
-
     function pers2(){
         var dna = page.dna;
+        var viewarea = parseInt(dna.substr(4, 3), 2)/8;
+        var movingchange = parseInt(dna.substr(7, 3), 2)/8;
+        var stillchange = parseInt(dna.substr(10, 3), 2)/8;
+        var directionchange = parseInt(dna.substr(13, 4), 2)/16;
+        var searchingduration = parseInt(dna.substr(36, 4), 2)/16;
 
-        var viewarea = 70 + parseInt(dna.substr(4, 3), 2) * 15;
-        var movingchange = 1 + parseInt(dna.substr(7, 3), 2);
-        var stillchange = 1 + parseInt(dna.substr(10, 3), 2);
-        var directionchange = parseInt(dna.substr(13, 4), 2);
-        var searchingduration = 300 + parseInt(dna.substr(36, 4), 2)*100;
-
-        var lazy = (stillchange - movingchange)*3;
-        var clever = (viewarea / 25) * (searchingduration / 250);
-        var hyperactive = (1 + movingchange)*(1 + (directionchange / 3)) - stillchange;
+        var lazy = stillchange*4 - movingchange;
+        var clever = viewarea*2 + searchingduration*2;
+        var hyperactive = (1 + movingchange)*(1 + directionchange) - stillchange;
 
         if(lazy > clever && lazy > hyperactive){
-            return 'Lazy';
+            return 'Lazy ('+Math.round((lazy/4)*100)+'%)';
         }
         else if(clever >= lazy && clever >= hyperactive){
-            return 'Clever';
+            return 'Clever ('+Math.round((clever/4)*100)+'%)';
         }
         else{
-            return 'Hyperactive';
+            return 'Hyperactive ('+Math.round((hyperactive/4)*100)+'%)';
         }
 
     }
@@ -205,9 +204,14 @@ Page {
                 onClicked: {
                     var dialog = pageStack.push("../components/dialog.qml", {"name": page.name})
                     dialog.accepted.connect(function() {
-                        page.name = dialog.name;
-                        DB.addset(page.dna, page.name, page.age, page.id); // Rename in animals table
-                        DB.ancestors_rename(page.id, page.name); // Rename in ancestors table
+                        page.namegender = dialog.genindex;
+                        page.newname = dialog.name;
+                        DB.setnamegender(page.id, page.namegender); // Set name gender
+                        if(page.newname !== ''){
+                            page.name = page.newname;
+                            DB.addset(page.dna, page.name, page.age, page.id); // Rename in animals table
+                            DB.ancestors_rename(page.id, page.name); // Rename in ancestors table
+                        }
                     })
                 }
             }
@@ -240,6 +244,7 @@ Page {
 
             Image {
                 id: image
+                smooth: false
                 source: '../img/moose2.png'
                 width: sourceSize.width * 2
                 height: sourceSize.height * 2

@@ -36,8 +36,10 @@ Page {
         }
         delegate: BackgroundItem {
             id: delegate
+            height: logtext.height + 20
 
             Label {
+                id: logtext
                 text: name
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
