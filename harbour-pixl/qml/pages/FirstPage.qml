@@ -8,6 +8,7 @@ import 'data.js' as DB
 Page {
     id: page
     property var animals: new Array()
+    property var predators: new Array()
     property var food: new Array()
     property var hearts: new Array()
     property bool debug: false // Display debug tools and disable automatic animal spawning
@@ -16,6 +17,7 @@ Page {
     property bool daynight: false // Activates day/night cycle
     property bool paused: true // Game is paused
     property int playtime: 0 // Time played in seconds
+    property int endindex: 0 // Index for end story
 
     Component.onCompleted: {
         DB.initialize();
@@ -338,6 +340,19 @@ Page {
             }
         }
 
+        // Trigger tick() for all predators
+        var pred = page.predators;
+
+        for (var i = 0; i < pred.length; i++){
+            if(pred[i].alive){
+                pred[i].tick();
+            }
+            else{ // Remove dead predators
+                pred.splice(i, 1);
+                i--;
+            }
+        }
+
     }
 
     function cleanup(){
@@ -364,6 +379,17 @@ Page {
         // Increment playtime
         page.playtime = DB.getsett(9);
         DB.setsett(9, playtime + 2);
+
+        // Log story message randomly (1 in x chance every 4 seconds)
+        if((page.playtime % 3) === 0 && Math.floor(Math.random()*2)==1){
+            var index = DB.getsett(10);
+            if(index === -1){
+                index = 0;
+            }
+            // Log message & update index
+            story(22);//index);
+            DB.setsett(10, index+1);
+        }
     }
 
     function spawnanimal(writelog){
@@ -399,6 +425,14 @@ Page {
         DB.setsett(6, id+1); // Increment nextid
         DB.ancestors_add(dna, name, id, parenta, parentb) // Add ancestor entry given parents
          log('birth', name, dna, id); // Log birth
+    }
+
+    function spawnpredator(){
+        var animal_comp = Qt.createComponent("../components/predator.qml");
+        // Moose spawned by simulation spawn at age 18 to reduce time to mating
+        var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*(page.height-60)+60)});
+        temp.generate();
+        page.predators.push(temp);
     }
 
     function randna(){
@@ -531,6 +565,28 @@ Page {
         updatelogmsg(texts[index]);
     }
 
+    function story(index){
+        var storylines = new Array();
+        storylines = ['Your head is aching. How long did you lie here before you woke up?', 'Sometimes, when you look at your reflection in the unruffled pond, you try to remember what was before the day you woke up here. You can\'t.', 'You feel alone. Alone in the endless woods. Maybe someone else is out there?', 'You barely sleep. Most nights, you just lie in the tall grass, gazing upon the starry sky above you.', 'How did you get here? Where did you come from? You look at the trees, silently waiting for answers.',
+                      'When you lie awake at night, questions start filling your head. Where are you? Why are you here?', 'You realize that the moose are your family now. You see them growing up, getting old and die. It\'s sad.', 'Every time you see a new corpse lying on the ground, you fall apart a little more. You miss them.', 'A single black raven is flying above you, heading north. It\'s the first bird you see here.', 'Sometimes when you dream, you see small, blurred fragments of old memories. You see buildings. A city.',
+                      'The days start to blend into each other. How long has it been since you woke up on the glade?', 'Sometimes, mostly at night, you see shadows moving trough the dense forest around you.', 'You see more ravens, all heading north, flying across the sky like dark harbingers.', 'You didn\'t dream for a long time now. It feels like the last connection to your old life is fading.', 'Every morning you remember your first day on the clearing. Remember the three moose, their soft fur, their smell.',
+                      'The memory of your first day here is the only thing that you have. It makes everything feel real.', 'In some nights, you can feel something in the forest around the glade. The woods feel alive.', 'It happened. You forgot their names. The only memory you had. Destroyed, erased.', 'After the dreams stopped, the nightmares began. You see yourself, running, fleeing, yet not getting anywhere.', 'Every once in a while, you can feel a nameless evil standing right behind you. You spin around. Nothing.',
+                      'The huge trees around you look more sinister than before. The entire forest appears to get darker and deeper every day.', 'You can\'t stand this feeling anymore. Always looking around you, just waiting for something to jump on you.', '<endgame>'];
+
+        if(storylines[index] == '<endgame>'){
+            // Activate end UI
+            enddialogue(); // Load message
+            endscreen.visible = true; // Show endscreen
+            endscreen.color = rect.color;
+            pause(); // Pause game for duration of end story
+        }
+        else if(index <= storylines.length + 1){
+            // If there is story to tell, log story message
+            DB.log_add(storylines[index]);
+            updatelogmsg(storylines[index]);
+        }
+    }
+
     // Shows & updates text of log message
     function updatelogmsg(text){
         msgtext.text = text;
@@ -610,7 +666,7 @@ Page {
         height: 110
         x: 300
         y: 700
-        z: 10000
+        z: 1000
     }
     Image {
         source: "../img/tree_shadow.png"
@@ -749,7 +805,8 @@ Page {
               onClicked: {
                   // Upper limit to avoid critical lag
                   if(page.animals.length < 31){
-                    spawnanimal(true)
+                    //spawnanimal(true)
+                    spawnpredator();
                   }
               }
            }
@@ -906,5 +963,89 @@ Page {
             return 'Hyperactive';
         }
 
+    }
+
+    // Endgame UI & Logic
+
+    function enddialogue(){
+        var storylines = new Array();
+        storylines = ['Despite any common sense, you run into the deep dark forest surrounding you. You have to get away. Just away.', 'You run trough the thick stems in a bizarre zigzag, trying to stay on your feet. Dead branches and leaves cover the forest floor.', 'You feel something behind you, quickly catching up as you stagger deeper and deeper into the woods.', 'You have to see it, just once, just for a second. You need certainty.', 'For a fraction of a second, you turn your head to see behind you. Nothing. A log on the ground. You stumble. You fall.', 'For a moment, you realize that your head is about to hit the ground, then the trees around you form a huge blur as everything fades away.', 'Everything is gone. You hear voices around you, whispering, eternal darkness surrounding you.', 'Slowly, you open your eyes. You look around. You\'re lying on a small glade in a deep forest.', 'You can see a few moose standing in the tall grass in front of you. They look friendly.']
+        if(page.endindex < storylines.length){
+            endtext.text = storylines[page.endindex];
+            if(page.endindex == 5){
+                blackouttimer.start();
+            }
+            else if(page.endindex == 7){
+                appeartimer.start();
+            }
+
+            page.endindex++;
+        }
+        else{
+            endscreen.color = 'transparent';
+            endtext.color = 'transparent';
+            hidetimer.start();
+        }
+    }
+
+    Rectangle {
+        id: endscreen
+        width: parent.width
+        height: parent.height
+        color: 'transparent'
+        visible: false
+        z: 2000
+        Behavior on color {
+            ColorAnimation {duration: 1500 }
+        }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: enddialogue()
+        }
+        Label {
+            id: endtext
+            visible: parent.visible
+            text: '[unknown]'
+            font.pixelSize: 30
+            font.family: pixels.name
+            z: 2001
+            wrapMode: Text.WordWrap
+            anchors {
+                left: parent.left
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+                leftMargin: Theme.paddingMedium
+                rightMargin: Theme.paddingMedium
+            }
+
+        }
+    }
+
+    Timer {
+        id: blackouttimer
+        interval: 3000
+        running: false
+        repeat: false
+        onTriggered: endscreen.color = '#000000'
+    }
+
+    Timer {
+        id: appeartimer
+        interval: 1000
+        running: false
+        repeat: false
+        onTriggered:{
+            endscreen.color = rect.color;
+        }
+    }
+
+    Timer {
+        id: hidetimer
+        interval: 1500
+        running: false
+        repeat: false
+        onTriggered:{
+            endscreen.visible = false;
+        }
     }
 }

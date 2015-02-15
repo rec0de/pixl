@@ -66,6 +66,7 @@ Image {
     property bool startstill: false // Signal for animal to start stillreset timer
     property bool startmate: false // Signal for animal to start matereset timer
     property bool local: true // Is local animal (required for planned 'multiplayer')
+    property bool starvelog: true // Used for logging cooldown
     property int slowdownage: 90 // Animal will be slowed down from this age on (age in user unit, internal units are 400 times larger)
     property int grownupage: 20 // Animal will be slowed down from this age on (age in user unit, internal units are 400 times larger)
     property int matecooldown: 60*5*1000 // 5 minutes 'cooldown'
@@ -256,6 +257,12 @@ Image {
         }
 
 
+        // Log message if starving
+        if(Math.round((animal.energy / animal.maxenergy)*100) < 15 && starvelog){
+            starvelog = false;
+            starvelogger.start();
+            page.log('starving', animal.name, animal.dna, animal.id)
+        }
 
         // Move animal
         if(moving){
@@ -478,6 +485,14 @@ Image {
         running: false
         repeat: false
         onTriggered: parent.still = false;
+    }
+
+    Timer {
+        id: starvelogger
+        interval: 4*60*1000
+        running: false
+        repeat: false
+        onTriggered: parent.starvelog = true;
     }
 
 }

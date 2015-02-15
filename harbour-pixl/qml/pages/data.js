@@ -14,6 +14,7 @@
 // 7   Next Id for nonlocal (Default: 0)
 // 8   Next ID for log
 // 9   Playtime in seconds
+// 10  Story index
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {
