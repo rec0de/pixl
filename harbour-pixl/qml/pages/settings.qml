@@ -30,6 +30,10 @@ Page {
         else{
             foodrate.value = 85; // Use default if DB value is not set
         }
+        if(DB.getsett(10) > 22){
+            // Only display story reset if story has been completed
+            storyreset.visible = true;
+        }
     }
 
     function updatedaytime(){
@@ -149,6 +153,17 @@ Page {
                 onClicked: {
                     switchdebug()
                 }
+            }
+
+            Button {
+               text: "Restart Story"
+               id: storyreset
+               visible: false
+               anchors.horizontalCenter: parent.horizontalCenter
+               onClicked:{
+                    DB.setsett(10, 0);
+                   visible: false;
+               }
             }
 
             Button {

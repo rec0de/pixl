@@ -387,7 +387,7 @@ Page {
                 index = 0;
             }
             // Log message & update index
-            story(22);//index);
+            story(index);
             DB.setsett(10, index+1);
         }
     }
@@ -577,13 +577,16 @@ Page {
             // Activate end UI
             enddialogue(); // Load message
             endscreen.visible = true; // Show endscreen
-            endscreen.color = rect.color;
             pause(); // Pause game for duration of end story
+            showtimer.start(); // Delay opacity animation (Doesn't work otherwise)
         }
         else if(index <= storylines.length + 1){
             // If there is story to tell, log story message
             DB.log_add(storylines[index]);
             updatelogmsg(storylines[index]);
+            if(index === 21){
+                storytimer.start();
+            }
         }
     }
 
@@ -971,6 +974,9 @@ Page {
         var storylines = new Array();
         storylines = ['Despite any common sense, you run into the deep dark forest surrounding you. You have to get away. Just away.', 'You run trough the thick stems in a bizarre zigzag, trying to stay on your feet. Dead branches and leaves cover the forest floor.', 'You feel something behind you, quickly catching up as you stagger deeper and deeper into the woods.', 'You have to see it, just once, just for a second. You need certainty.', 'For a fraction of a second, you turn your head to see behind you. Nothing. A log on the ground. You stumble. You fall.', 'For a moment, you realize that your head is about to hit the ground, then the trees around you form a huge blur as everything fades away.', 'Everything is gone. You hear voices around you, whispering, eternal darkness surrounding you.', 'Slowly, you open your eyes. You look around. You\'re lying on a small glade in a deep forest.', 'You can see a few moose standing in the tall grass in front of you. They look friendly.']
         if(page.endindex < storylines.length){
+
+            // Fade in new text
+            endtext.opacity = 1;
             endtext.text = storylines[page.endindex];
             if(page.endindex == 5){
                 blackouttimer.start();
@@ -978,7 +984,7 @@ Page {
             else if(page.endindex == 7){
                 appeartimer.start();
             }
-
+            DB.log_add(storylines[page.endindex]);
             page.endindex++;
         }
         else{
@@ -988,24 +994,36 @@ Page {
         }
     }
 
+    function nextmessage(){
+        // Fade out old text
+        endtext.opacity = 0;
+        textfader.start();
+    }
+
     Rectangle {
         id: endscreen
         width: parent.width
         height: parent.height
-        color: 'transparent'
+        color: rect.color
+        opacity: 0
         visible: false
         z: 2000
         Behavior on color {
             ColorAnimation {duration: 1500 }
         }
+        Behavior on opacity {
+            PropertyAnimation {duration: 1000}
+        }
+
         MouseArea {
             anchors.fill: parent
-            onClicked: enddialogue()
+            onClicked: nextmessage()
         }
+
         Label {
             id: endtext
             visible: parent.visible
-            text: '[unknown]'
+            text: 'Sorry, this shouldn\'t happen.'
             font.pixelSize: 30
             font.family: pixels.name
             z: 2001
@@ -1016,6 +1034,10 @@ Page {
                 verticalCenter: parent.verticalCenter
                 leftMargin: Theme.paddingMedium
                 rightMargin: Theme.paddingMedium
+            }
+
+            Behavior on opacity {
+                PropertyAnimation {duration: 750}
             }
 
         }
@@ -1046,6 +1068,38 @@ Page {
         repeat: false
         onTriggered:{
             endscreen.visible = false;
+        }
+    }
+
+    Timer {
+        id: showtimer
+        interval: 100
+        running: false
+        repeat: false
+        onTriggered:{
+            endscreen.opacity = 1;
+        }
+    }
+
+    Timer {
+        id: textfader
+        interval: 750
+        running: false
+        repeat: false
+        onTriggered:{
+            enddialogue();
+        }
+    }
+
+    Timer {
+        id: storytimer
+        interval: 4000
+        running: false
+        repeat: false
+        onTriggered:{
+            var index = DB.getsett(10);
+            story(index);
+            DB.setsett(10, index+1);
         }
     }
 }
