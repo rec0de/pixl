@@ -53,11 +53,13 @@ Add random names (done)
 
 Make old animals less likely to mate (done)
 
-Fix mating reset on restart (probably done)
+Fix mating reset on restart (done)
 
-Add event log (in progress)
+Add event log (mostly done)
 
-Add predators / other death causes (planned)
+Add predators (mostly done)
+
+Add other death causes (planned)
 
 Improve animal movement
 

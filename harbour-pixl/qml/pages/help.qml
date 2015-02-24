@@ -108,7 +108,7 @@ Page {
             }
 
             Label {
-                text:   'When two grown up (age > 20) animals stand next to each other, there is a chance that they will mate and create a new animal. This chance depends on both animals energy (higher is better) and age (lower is better). The new animals DNA is a combination of the parents DNA. After an animal has mated, it can\'t mate again for ~5 minutes.'
+                text:   'When two grown up (age > 20) animals stand next to each other, there is a chance that they will mate and create a new animal. This chance depends on both animals energy (higher is better) and age (lower is better, only if high age slowdown is enabled). The new animals DNA is a combination of the parents DNA. After an animal has mated, it can\'t mate again for ~5 minutes.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -124,7 +124,7 @@ Page {
             }
 
             Label {
-                text:   'There is no such thing as gender in this game. It\'s not just that the population is entirely male/female. The moose simply have no gender. However, in my opinion, only adressing moose in a gender-neutral way in the event messages hurts overall feeling of the game. Therefore, I decided to add an option on the rename dialog to define if the new name (not the moose itself) is female or male. This makes the event messages sound way better and does not influence anything else.'
+                text:   'There is no such thing as gender in this game. It\'s not just that the population is entirely male/female. The moose simply have no gender. However, in my opinion, only adressing moose in a gender-neutral way in the event messages hurts the overall feeling of the game. Therefore, I decided to add an option in the rename dialog to define if the new name (not the moose itself) is female or male. This makes the event messages sound way better and does not influence anything else.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -157,7 +157,23 @@ Page {
             }
 
             Label {
-                text:   'Once an animals age, which can be seen on its stats page, reaches 20, the animal is considered a grown up and is able to mate with other animals. When an animal reaches the age of 90, its movement speed will slowly decline making it harder for this animal to survive. From the age ~80 on, the mating probability of the animal will decrease drastically. This slowdown can be disabled in the settings menu.'
+                text:   'Once an animals age, which can be seen on its stats page, reaches 20, the animal is considered a grown up and is able to mate with other animals. When an animal reaches the age of 90, its movement speed will slowly decline making it harder for this animal to survive. From the age ~80 on, the mating probability of the animal will decrease drastically. This slowdown and mating probability decrease can be disabled in the settings menu.'
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+            SectionHeader {
+                text: "Predators"
+            }
+
+            Label {
+                text:   'Every once in a while, a predator will spawn. These animals are generated randomly and will try to chase moose and kill them. Once a predator has eaten a moose or ran out of energy, it will leave the glade and return to the forest around it. Predator spawning can be disabled in the settings.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {

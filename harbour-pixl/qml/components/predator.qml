@@ -18,10 +18,10 @@ Image {
     property int movingchange: 2 // Probability of state change from moving to still in %
     property int stillchange: 2 // Probability of state change from still to moving in %
     property int directionchange: 4 // Probability of direction change while moving in %
-    property int maxenergy: 5 // Makimum energy the animal can store
+    property int maxenergy: 3 // Makimum energy the animal can store
     property int jumpforce: 10
-    property real energystill: .001 // Energy consumed while still
-    property real energymoving: .002 // Energy consumed while moving
+    property real energystill: .002 // Energy consumed while still
+    property real energymoving: .004 // Energy consumed while moving
     property real maxspeed: 4 // Max Walking speed
     property real minspeed: 1 // Min Walking Speed
     property int searchingduration: 500 // Max. duration of searching state
@@ -39,6 +39,7 @@ Image {
     property bool alive: true
     property bool moving: true
     property bool searching: false // Animal is searching for something, higher attention
+    property bool retreat: false // Causes predator to return to screen edge and despawn
 
     Image {
         id: shadow
@@ -52,6 +53,16 @@ Image {
         z: 0
     }
 
+    Text{
+        id: pred_energy
+        visible: page.debug
+        x: 50
+        text: parent.energy
+        color: '#ffffff'
+        font.pixelSize: 16
+        font.family: pixels.name
+    }
+
     function tick(){
 
         y = absy - yshift;
@@ -60,14 +71,16 @@ Image {
         // Moving state change
         if(Math.random()*100 < stillchange && !moving){
             moving = ! moving;
-            randomdirection();
+            if(!retreat){
+                randomdirection();
+            }
         }
         else if(Math.random()*100 < movingchange && moving ){
            moving = ! moving;
         }
 
         // Look for moose
-        if(Math.floor(Math.random()*10) == 5 || searching){ // Look for moose aprox. every 10 ticks
+        if((Math.floor(Math.random()*10) == 5 || searching)&& !retreat){ // Look for moose aprox. every 10 ticks
 
             // Check for moose within viewarea
             var dist;
@@ -78,9 +91,14 @@ Image {
                     var dy = y - page.animals[i].y
                     dist = Math.sqrt(dx*dx + dy*dy)
                     if(dist < viewarea && dist > 0){
-                        if(dist < 30){
+                        if(dist < 15){
                             // Stop movement
                             moving = false;
+                            // Attack animal
+                            page.animals[i].predkill = true;
+                            page.animals[i].energy = 0;
+                            animal.energy = animal.energy + 2;
+                            retreat = true;
                         }
                         else{
                             searching = true;
@@ -94,6 +112,23 @@ Image {
 
         }
 
+        // Move towards screen edge if retreating
+        if(retreat && !moving){
+            // Get distance from both screen edges
+            var toleft = x + 35;
+            var toright = rect.width - x
+            // Don't move in a straight line
+            var yadjust = y + (Math.floor(Math.random()*2)-1.5)*2*Math.floor(Math.random()*20);
+            // Move to closest screen edge
+            if(toleft < toright){
+                xytodirection(-35, y);
+            }
+            else{
+                xytodirection(rect.width, y);
+            }
+
+        }
+
         // Move animal
         if(moving){
             absy = absy + yspeed;
@@ -101,13 +136,23 @@ Image {
 
 
             // Keep animal on screen (x axis)
-            if(x < 0){
-                x = 0;
-                randomdirection();
+            if(x < -35){
+                x = -35;
+                if(retreat){
+                    despawn()
+                }
+                else{
+                    randomdirection();
+                }
             }
-            else if(x > rect.width - 45){
-                x = rect.width -45;
-                randomdirection();
+            else if(x > rect.width){
+                x = rect.width;
+                if(retreat){
+                    despawn()
+                }
+                else{
+                    randomdirection();
+                }
             }
 
             // Keep animal on screen (y axis)
@@ -157,6 +202,9 @@ Image {
         if(energy <= 0){
             die();
         }
+        else if(energy < 1){
+            retreat = true;
+        }
     }
 
     // End tick function
@@ -167,20 +215,27 @@ Image {
         height = 45;
         shadow.visible = false;
         alive = false;
-
+        page.log('pred_death', false, false, false);
         destroy(8000);
     }
 
+    function despawn(){
+        shadow.visible = false;
+        alive = false;
+        page.log('pred_despawn', false, false, false);
+        destroy();
+    }
+
     function generate(){
-            viewarea = 70 + Math.floor(Math.random()*8) * 15;
-            movingchange = 1 + Math.floor(Math.random()*8);
-            stillchange = 1 + Math.floor(Math.random()*8);
+            viewarea = 80 + Math.floor(Math.random()*8) * 15;
+            movingchange = 1 + Math.floor(Math.random()*7);
+            stillchange = 4 + Math.floor(Math.random()*10);
             directionchange = Math.floor(Math.random()*16);
-            maxenergy = 4 + Math.floor(Math.random()*8);
-            energystill = 0.001 + Math.floor(Math.random()*8)/2000;
-            minspeed = 0.5 + Math.floor(Math.random()*8)/2;
-            maxspeed = minspeed + Math.floor(Math.random()*8)/1.5
-            energymoving = energystill * (1 + maxspeed / 10) * (1 + Math.floor(Math.random()*8)/15)
+            maxenergy = 2 + Math.floor(Math.random()*3);
+            energystill = 0.002 + Math.floor(Math.random()*10)/1900;
+            minspeed = 0.7 + Math.floor(Math.random()*7)/2;
+            maxspeed = minspeed + Math.floor(Math.random()*10)/1.5
+            energymoving = energystill * (1 + maxspeed / 9) * (1 + Math.floor(Math.random()*8)/15)
             jumpforce = 7 + Math.floor(Math.random()*8);
             searchingduration = 300 + Math.floor(Math.random()*16)*100;
     }

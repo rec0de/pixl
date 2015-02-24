@@ -24,6 +24,10 @@ Page {
             slowage.checked = true;
         }
 
+        if(DB.getsett(11) != 0){
+            spawnpred.checked = true;
+        }
+
         if(DB.getsett(3) != -1){
             foodrate.value = DB.getsett(3);
         }
@@ -64,6 +68,18 @@ Page {
         }
     }
 
+    function switchpred(){
+        var pred = DB.getsett(11);
+        if(pred != 0){
+            DB.setsett(11, 0); // Deactivate predators
+            spawnpred.checked = false;
+        }
+        else{
+            DB.setsett(11, 1); // Activate predators
+            spawnpred.checked = true;
+        }
+    }
+
 
     // Save new foodrate to DB
     function updatefoodrate(){
@@ -101,6 +117,17 @@ Page {
                 checked: false
                 onClicked: {
                     switchslowage()
+                }
+            }
+
+            TextSwitch {
+                id: spawnpred
+                text: "Predators"
+                description: "Activates predator spawning"
+                automaticCheck: false
+                checked: false
+                onClicked: {
+                    switchpred()
                 }
             }
 
@@ -162,7 +189,7 @@ Page {
                anchors.horizontalCenter: parent.horizontalCenter
                onClicked:{
                     DB.setsett(10, 0);
-                   visible: false;
+                    storyreset.visible = false;
                }
             }
 

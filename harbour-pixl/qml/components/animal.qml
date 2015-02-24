@@ -67,9 +67,11 @@ Image {
     property bool startmate: false // Signal for animal to start matereset timer
     property bool local: true // Is local animal (required for planned 'multiplayer')
     property bool starvelog: true // Used for logging cooldown
+    property bool predkill: false // True if killed by predator
     property int slowdownage: 90 // Animal will be slowed down from this age on (age in user unit, internal units are 400 times larger)
     property int grownupage: 20 // Animal will be slowed down from this age on (age in user unit, internal units are 400 times larger)
     property int matecooldown: 60*5*1000 // 5 minutes 'cooldown'
+    property int attention: 10 // How often animal looks for predators, lower is better
 
     // Database related
     property string name: 'Mr. Moose'
@@ -200,14 +202,15 @@ Image {
 
                             // Mate with certain probability based on energy and age if both animals are local, age over 20 , matable and not already mating
                             var multa = 1/(energy / maxenergy);
-                            if((age/400) > 81.5){
+                            if((age/400) > 81.5 && page.slowdown){
                                 multa += Math.log((age/400)-80) * 1.5;
                             }
-                            var multb = 1/(page.animals[i].energy / page.animals[i].maxenergy) + Math.pow(1.3,((page.animals[i].age/400)-80));
-                            if((page.animals[i].age/400) > 81.5){
+                            var multb = 1/(page.animals[i].energy / page.animals[i].maxenergy);
+                            if((page.animals[i].age/400) > 81.5 && page.slowdown){
                                 multb += Math.log((page.animals[i].age/400)-80) * 1.5;
                             }
                             var multplicator = (multa * multb)*5; // 5 if both animals have 100% and youger than 80, higher if animals are hungry
+
                             if(!still && !page.animals[i].still && local && page.animals[i].local && age >= grownupage*400 && page.animals[i].age >= grownupage*400 && Math.floor(Math.random()*multplicator) === 1 && DB.getmatetime(id) < page.playtime && DB.getmatetime(page.animals[i].id) < page.playtime){
 
                                 // Align faces
@@ -254,6 +257,22 @@ Image {
             }
 
 
+        }
+
+        // Look for predators
+        if(page.predators.length > 0 && Math.floor(Math.random()*animal.attention) === 1){
+            // Check for other moose within viewarea
+            for (i = 0; i < page.predators.length; i++){
+                dist = -1;
+                if(page.predators[i].alive){
+                    dx = x - (page.predators[i].x + 50)
+                    dy = y - page.predators[i].y
+                    dist = Math.sqrt(dx*dx + dy*dy)
+                    if(dist < viewarea){
+                        xytodirection(2*dx, 2*dy); // Run in opposite direction
+                    }
+                }
+            }
         }
 
 
@@ -337,8 +356,12 @@ Image {
         alive = false;
 
         // Log death
-        page.log('death', animal.name, animal.dna, animal.id)
-
+        if(predkill){
+            page.log('pred_kill', animal.name, animal.dna, animal.id)
+        }
+        else{
+            page.log('death', animal.name, animal.dna, animal.id)
+        }
         destroy(8000);
     }
 
@@ -424,6 +447,25 @@ Image {
         }
         else{
             yspeed = absy;
+        }
+
+        // Avoid running into screen border
+        if(animal.x < 10){
+            // xspeed has to be positive
+            xspeed = Math.abs(xspeed);
+        }
+        else if(animal.x > page.width - animal.width - 5){
+            // xspeed has to be negative
+            xspeed = - Math.abs(xspeed);
+        }
+
+        if(animal.y < 65){
+            // yspeed has to be positive
+            yspeed = Math.abs(yspeed);
+        }
+        else if(animal.y > page.height - animal.height - 5){
+            // yspeed has to be negative
+            yspeed = - Math.abs(yspeed);
         }
     }
 

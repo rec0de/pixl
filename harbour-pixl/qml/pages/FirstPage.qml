@@ -13,6 +13,7 @@ Page {
     property var hearts: new Array()
     property bool debug: false // Display debug tools and disable automatic animal spawning
     property bool slowdown: true // Enables/Disables age based animal slowdown
+    property bool spawnpred: true // Enables/Disables predator spawning
     property int foodspawn: 85 // Food spawn probability (per tick)
     property bool daynight: false // Activates day/night cycle
     property bool paused: true // Game is paused
@@ -156,6 +157,14 @@ Page {
         }
         else{
             page.slowdown = false;
+        }
+
+        // Update predator spawning
+        if(DB.getsett(11) != 0){
+            page.spawnpred = true;
+        }
+        else{
+            page.spawnpred = false;
         }
 
         // Update food rate
@@ -428,11 +437,22 @@ Page {
     }
 
     function spawnpredator(){
-        var animal_comp = Qt.createComponent("../components/predator.qml");
-        // Moose spawned by simulation spawn at age 18 to reduce time to mating
-        var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*(page.height-60)+60)});
-        temp.generate();
-        page.predators.push(temp);
+        if(page.spawnpred){
+            var animal_comp = Qt.createComponent("../components/predator.qml");
+
+            // Spawn predators at screen edge
+            if(Math.floor(Math.random()*2)===0){
+                var x = -45;
+            }
+            else{
+                var x = page.width;
+            }
+
+            var temp = animal_comp.createObject(page, {x: x, absy: Math.floor(Math.random()*(page.height-60)+60)});
+            temp.generate();
+            page.predators.push(temp);
+            log('pred_spawn', false, false, false);
+        }
     }
 
     function randna(){
@@ -535,13 +555,25 @@ Page {
             texts = [name + ' is starving, barely able to keep walking.', name+' is hungering, desperately trying to find food. ', name+' is desperately looking for something edible.'];
         }
         else if(event === 'birth'){
-            texts = ['A new moose is born. '+heshe.capitalize()+' looks cute with '+hisher+' huge dark eyes and '+color+' fur.'];
+            texts = ['A new moose is born. '+heshe.capitalize()+' looks cute with '+hisher+' huge dark eyes and '+color+' fur.', 'A new moose is born. '+heshe.capitalize()+' clumsily walks around as '+heshe+' explores '+hisher+' new surroundings.', 'A moose is born. '+heshe.capitalize()+' looks at you with '+hisher+'huge eyes while '+hisher+' parents are watching '+himher+' from a distance.'];
         }
         else if(event === 'death'){
             texts = [name + ' collapses on the ground, breathing for one last time.', 'A corpse lies on the ground, nothing but skin and bone. It\'s '+name+'.', name+' looks at you for the last time. '+hisher.capitalize()+' big eyes close, slowly. '+heshe.capitalize()+'\'s dead. You know it.', name+' staggers towards you, '+hisher+' '+color+' fur is tattered. '+heshe.capitalize()+' collapses in front of you. You know '+heshe+' won\'t stand up again.'];
         }
+        else if(event === 'pred_spawn'){
+            texts = ['A single predator creeps out of the bushes, looking for prey with its bloodshot eyes.', 'A predator bursts out of the deep woods surrounding the clearing.', 'You hear a deep roar as a single predator jumps out of a bush near the woods.'];
+        }
+        else if(event === 'pred_despawn'){
+            texts = ['The predator vanishes in the dark woods surrounding the glade.', 'Slowly, the predator retreats to the edge of the forest and disappears in the dark bushes.'];
+        }
+        else if(event === 'pred_death'){
+            texts = ['The predator collapses in the tall grass, gazing at the sky with wide eyes.'];
+        }
+        else if(event === 'pred_kill'){
+            texts = ['The predator attacks '+name+'. '+heshe.capitalize()+' hasn\'t got a chance.'];
+        }
         else if(event === 'ambient_day'){
-            texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.'];
+            texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple trough the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.'];
         }
         else if(event === 'ambient_night'){
             texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the ponds surface, swirling trough the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.'];
@@ -580,9 +612,10 @@ Page {
             pause(); // Pause game for duration of end story
             showtimer.start(); // Delay opacity animation (Doesn't work otherwise)
         }
-        else if(index <= storylines.length + 1){
+        else if(index < storylines.length){
             // If there is story to tell, log story message
             DB.log_add(storylines[index]);
+            console.log(index);
             updatelogmsg(storylines[index]);
             if(index === 21){
                 storytimer.start();
@@ -836,6 +869,7 @@ Page {
             text: 'unknown'
             font.pixelSize: 21
             font.family: pixels.name
+            lineHeight: 1.1
             wrapMode: Text.WordWrap
             anchors {
                 left: parent.left
