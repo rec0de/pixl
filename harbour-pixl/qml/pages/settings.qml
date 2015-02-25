@@ -28,6 +28,10 @@ Page {
             spawnpred.checked = true;
         }
 
+        if(DB.getsett(12) != 0){
+            showmsg.checked = true;
+        }
+
         if(DB.getsett(3) != -1){
             foodrate.value = DB.getsett(3);
         }
@@ -80,6 +84,18 @@ Page {
         }
     }
 
+    function switchmsg(){
+        var pred = DB.getsett(12);
+        if(pred != 0){
+            DB.setsett(12, 0); // Deactivate messages
+            showmsg.checked = false;
+        }
+        else{
+            DB.setsett(12, 1); // Activate messages
+            showmsg.checked = true;
+        }
+    }
+
 
     // Save new foodrate to DB
     function updatefoodrate(){
@@ -128,6 +144,17 @@ Page {
                 checked: false
                 onClicked: {
                     switchpred()
+                }
+            }
+
+            TextSwitch {
+                id: showmsg
+                text: "Log messages on main screen"
+                description: "Shows log notifications in-game"
+                automaticCheck: false
+                checked: false
+                onClicked: {
+                    switchmsg()
                 }
             }
 

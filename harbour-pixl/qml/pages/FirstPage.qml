@@ -14,6 +14,7 @@ Page {
     property bool debug: false // Display debug tools and disable automatic animal spawning
     property bool slowdown: true // Enables/Disables age based animal slowdown
     property bool spawnpred: true // Enables/Disables predator spawning
+    property bool showmsgs: true // Shows log messages on main screen
     property int foodspawn: 85 // Food spawn probability (per tick)
     property bool daynight: false // Activates day/night cycle
     property bool paused: true // Game is paused
@@ -165,6 +166,14 @@ Page {
         }
         else{
             page.spawnpred = false;
+        }
+
+        // Update log messages
+        if(DB.getsett(12) != 0){
+            page.showmsgs = true;
+        }
+        else{
+            page.showmsgs = false;
         }
 
         // Update food rate
@@ -570,7 +579,7 @@ Page {
             texts = ['The predator collapses in the tall grass, gazing at the sky with wide eyes.'];
         }
         else if(event === 'pred_kill'){
-            texts = ['The predator attacks '+name+'. '+heshe.capitalize()+' hasn\'t got a chance.'];
+            texts = ['The predator attacks '+name+'. '+heshe.capitalize()+' hasn\'t got a chance.', name+' is lying on the ground, lifeless. '+hisher.capitalize()+' '+color+' fur is stained with dark red blood.', 'The predator jumps on '+name+', digging its long sharp teeth deep into '+hisher+' fur. '+heshe.captitalize()+'\'s dead within a few seconds.'];
         }
         else if(event === 'ambient_day'){
             texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple trough the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.'];
@@ -625,8 +634,10 @@ Page {
 
     // Shows & updates text of log message
     function updatelogmsg(text){
-        msgtext.text = text;
-        logmsg.visible = true;
+        if(page.showmsgs){
+            msgtext.text = text;
+            logmsg.visible = true;
+        }
     }
 
 

@@ -16,6 +16,7 @@
 // 9   Playtime in seconds
 // 10  Story index
 // 11  Spawn predators
+// 12  Show log messages
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {
