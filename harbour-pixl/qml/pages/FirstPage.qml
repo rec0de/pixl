@@ -15,6 +15,7 @@ Page {
     property bool slowdown: true // Enables/Disables age based animal slowdown
     property bool spawnpred: true // Enables/Disables predator spawning
     property bool showmsgs: true // Shows log messages on main screen
+    property bool night: false // Indicates nighttime
     property int foodspawn: 85 // Food spawn probability (per tick)
     property bool daynight: false // Activates day/night cycle
     property bool paused: true // Game is paused
@@ -63,11 +64,6 @@ Page {
             DB.setsett(5, 3);
         }
 
-        // Log starting message on first startup or after update
-        if(DB.getsett(5) < 4 || DB.getsett(5) === -1){
-            log('firststart', false, false, false);
-            DB.setsett(5, 4);
-        }
 
 
         // Load local animals from DB
@@ -114,8 +110,15 @@ Page {
         // Update other settings
         updatesettings();
 
-        // Log ambient message
-        if(pond.source == '../img/pond_night.png'){
+        timecycle(); // Update daytime
+
+        // Log starting message on first startup or after update
+        if(DB.getsett(5) < 4 || DB.getsett(5) === -1){
+            log('firststart', false, false, false);
+            DB.setsett(5, 4);
+        }
+        // Otherwise log ambient message
+        else if(page.night){
             log('ambient_night', false, false, false);
         }
         else{
@@ -133,11 +136,13 @@ Page {
             rect.color = '#334613';
             pond.source = "../img/pond_night.png";
             page.daynight = false;
+            page.night = true;
         }
         else if(DB.getsett(0) == 0){
             rect.color = '#84b331';
             pond.source = "../img/pond_day.png";
             page.daynight = false;
+            page.night = false;
         }
         else{
             timecycle();
@@ -396,10 +401,16 @@ Page {
 
         // Increment playtime
         page.playtime = DB.getsett(9);
+
+        if(page.playtime % 2 === 1){
+            playtime = playtime - 1;
+        }
+
         DB.setsett(9, playtime + 2);
 
-        // Log story message randomly (1 in x chance every 4 seconds)
-        if((page.playtime % 3) === 0 && Math.floor(Math.random()*2)==1){
+        // Log story message randomly (1 in 4 chance every 90 seconds)
+        // Average time for complete story: (4*90*22)/60 = 132min = approx. 2h
+        if((page.playtime % 90) === 0 && Math.floor(Math.random()*4)==1){
             var index = DB.getsett(10);
             if(index === -1){
                 index = 0;
@@ -407,6 +418,11 @@ Page {
             // Log message & update index
             story(index);
             DB.setsett(10, index+1);
+        }
+
+        // Spawn predator randomly (1 in 100 chance every 6 seconds)
+        if(page.playtime % 6 === 0 && Math.floor(Math.random()*100)===1){
+            spawnpredator();
         }
     }
 
@@ -416,12 +432,15 @@ Page {
         if(id === '-1'){
             id = 0;
         }
-        var name = ranname();
+        var ranresult = ranname();
+        var name = ranresult[0];
+        var namegender = ranresult[1];
         var animal_comp = Qt.createComponent("../components/animal.qml");
         // Moose spawned by simulation spawn at age 18 to reduce time to mating
         var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*(page.height-60)+60), age: 18*400, id: id, name: name});
         temp.importfromdna(dna);
         page.animals.push(temp);
+        DB.setnamegender(id, namegender);
         DB.setsett(6, id+1); // Increment nextid
         DB.ancestors_add(dna, name, id, -1, -1) // Add ancestor entry with unknown parents
         if(writelog){
@@ -436,10 +455,13 @@ Page {
         if(id === '-1'){
             id = 0;
         }
-        var name = ranname();
+        var ranresult = ranname();
+        var name = ranresult[0];
+        var namegender = ranresult[1];
         var temp = animal_comp.createObject(page, {x: x, absy: y, id: id, name: name});
         temp.importfromdna(dna);
         page.animals.push(temp);
+        DB.setnamegender(id, namegender);
         DB.setsett(6, id+1); // Increment nextid
         DB.ancestors_add(dna, name, id, parenta, parentb) // Add ancestor entry given parents
          log('birth', name, dna, id); // Log birth
@@ -481,10 +503,12 @@ Page {
     // returns random name
     function ranname(){
         var names = new Array();
+        var nameg = new Array(); // Name gender lookup
         // Moose in different languages
         names = ['Elg', 'Eland', 'Poder', 'Hirvi', 'Elan', 'Elch', 'Elgur', 'Munsu', 'Eilc', 'Alce', 'Alces', 'Briedis', 'Atawhenua', 'Losi', 'Uncal', 'Älg', 'Elciaid'];
+        nameg = [    0,       1,       0,       1,      1,      0,       0,       0,      1,      1,       1,         0,           1,      1,       0,     0,         1];
         var index = Math.floor(Math.random()*names.length);
-        return names[index];
+        return new Array(names[index], nameg[index]);
     }
 
 
@@ -507,6 +531,7 @@ Page {
                     log('sundown', false, false, false);
                 }
                 pond.source = '../img/pond_night.png';
+                page.night = true;
             }
             else{
                 // If state has changed from day to night, log sunrise
@@ -514,6 +539,7 @@ Page {
                     log('sunrise', false, false, false);
                 }
                 pond.source = '../img/pond_day.png';
+                page.night = false;
             }
 
             // Set prevtime
@@ -558,13 +584,13 @@ Page {
         }
 
         if(event === 'spawn'){
-            texts = ['A new moose enters the clearing. '+hisher.capitalize()+' '+color+' fur is ruffeled.', 'A young moose walks out of the deep forest surrounding the clearing.', 'A moose emerges from the bushes that surround the glade. '+heshe.capitalize()+'\'s new here.', 'A new moose appears on the glade. Where did '+heshe+' come from?', 'A strange sound comes out of the bushes. It\'s a '+color+' moose. You haven\'t seen '+himher+' here before.'];
+            texts = ['A new moose enters the clearing. '+hisher.capitalize()+' '+color+' fur is ruffeled.', 'A young moose walks out of the deep forest surrounding the clearing. You\'ll call '+himher+' '+name+'.', 'A moose emerges from the bushes that surround the glade. '+heshe.capitalize()+'\'s new here.', name+' appears on the glade. Where did '+heshe+' come from?', 'A strange sound comes out of the bushes. It\'s a '+color+' moose. You haven\'t seen '+himher+' here before.'];
         }
         else if(event === 'starving'){
-            texts = [name + ' is starving, barely able to keep walking.', name+' is hungering, desperately trying to find food. ', name+' is desperately looking for something edible.'];
+            texts = [name + ' is starving, barely able to keep walking.', name+' is hungering, desperately trying to find food. ', name+' is desperately looking for something edible.', 'You see '+name+' desperately searching for food in the tall grass.', name+' looks skinnier than usual. '+heshe.capitalize()+' looks at you, desperate, hungry.'];
         }
         else if(event === 'birth'){
-            texts = ['A new moose is born. '+heshe.capitalize()+' looks cute with '+hisher+' huge dark eyes and '+color+' fur.', 'A new moose is born. '+heshe.capitalize()+' clumsily walks around as '+heshe+' explores '+hisher+' new surroundings.', 'A moose is born. '+heshe.capitalize()+' looks at you with '+hisher+'huge eyes while '+hisher+' parents are watching '+himher+' from a distance.'];
+            texts = ['A new moose is born. '+heshe.capitalize()+' looks cute with '+hisher+' huge dark eyes and '+color+' fur. You\'ll call '+himher+' '+name+'.', name+' is born. '+heshe.capitalize()+' clumsily walks around as '+heshe+' explores '+hisher+' new surroundings.', 'A moose is born. '+heshe.capitalize()+' looks at you with '+hisher+' huge eyes while '+hisher+' parents are watching '+himher+' from a distance.', name+' is born. You can see the reflection of your face in '+hisher+' deep, dark eyes as '+heshe+' looks up to you.'];
         }
         else if(event === 'death'){
             texts = [name + ' collapses on the ground, breathing for one last time.', 'A corpse lies on the ground, nothing but skin and bone. It\'s '+name+'.', name+' looks at you for the last time. '+hisher.capitalize()+' big eyes close, slowly. '+heshe.capitalize()+'\'s dead. You know it.', name+' staggers towards you, '+hisher+' '+color+' fur is tattered. '+heshe.capitalize()+' collapses in front of you. You know '+heshe+' won\'t stand up again.'];
@@ -573,13 +599,13 @@ Page {
             texts = ['A single predator creeps out of the bushes, looking for prey with its bloodshot eyes.', 'A predator bursts out of the deep woods surrounding the clearing.', 'You hear a deep roar as a single predator jumps out of a bush near the woods.'];
         }
         else if(event === 'pred_despawn'){
-            texts = ['The predator vanishes in the dark woods surrounding the glade.', 'Slowly, the predator retreats to the edge of the forest and disappears in the dark bushes.'];
+            texts = ['The predator vanishes in the dark woods surrounding the glade.', 'Slowly, the predator retreats to the edge of the forest and disappears in the dark bushes.', 'Slowly, the predator creeps back into the dark woods that he came from, leaving muddy footprints behind.'];
         }
         else if(event === 'pred_death'){
-            texts = ['The predator collapses in the tall grass, gazing at the sky with wide eyes.'];
+            texts = ['The predator collapses in the tall grass, gazing at the sky with wide eyes.', 'You see the predator lying on the ground, his lifeless black eyes still opened.'];
         }
         else if(event === 'pred_kill'){
-            texts = ['The predator attacks '+name+'. '+heshe.capitalize()+' hasn\'t got a chance.', name+' is lying on the ground, lifeless. '+hisher.capitalize()+' '+color+' fur is stained with dark red blood.', 'The predator jumps on '+name+', digging its long sharp teeth deep into '+hisher+' fur. '+heshe.captitalize()+'\'s dead within a few seconds.'];
+            texts = ['The predator attacks '+name+'. '+heshe.capitalize()+' hasn\'t got a chance.', name+' is lying on the ground, lifeless. '+hisher.capitalize()+' '+color+' fur is stained with dark red blood.', 'The predator jumps on '+name+', digging its long sharp teeth deep into '+hisher+' fur. '+heshe.capitalize()+'\'s dead within a few seconds.'];
         }
         else if(event === 'ambient_day'){
             texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple trough the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.'];
@@ -852,8 +878,7 @@ Page {
               onClicked: {
                   // Upper limit to avoid critical lag
                   if(page.animals.length < 31){
-                    //spawnanimal(true)
-                    spawnpredator();
+                    spawnanimal(true);
                   }
               }
            }

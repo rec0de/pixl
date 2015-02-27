@@ -277,7 +277,7 @@ Image {
 
 
         // Log message if starving
-        if(Math.round((animal.energy / animal.maxenergy)*100) < 15 && starvelog){
+        if(Math.round((animal.energy / animal.maxenergy)*100) < 25 && starvelog){
             starvelog = false;
             starvelogger.start();
             page.log('starving', animal.name, animal.dna, animal.id)
@@ -442,12 +442,13 @@ Image {
         else{
             xspeed = absx;
         }
-        if(Math.floor(Math.random()*2) == 1){
+        if(Math.floor(Math.random()*2) < 0.8){ // Adjust probability to avoid animals grouping on top of screen
             yspeed = - absy;
         }
         else{
             yspeed = absy;
         }
+
 
         // Avoid running into screen border
         if(animal.x < 10){
