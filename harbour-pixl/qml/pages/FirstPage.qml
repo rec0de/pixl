@@ -419,7 +419,7 @@ Page {
         DB.setsett(9, playtime + 2);
 
         // Log story message randomly (1 in 5 chance every 80 seconds)
-        // Average time for complete story: (5*90*22)/60 = approx 165min = 2.75h
+        // Average time for complete story: (5*100*22)/60 = ~ 83min = ~ 3h
         if((page.playtime % 80) === 0 && Math.floor(Math.random()*5)==1){
             var index = DB.getsett(10);
             if(index === -1){
