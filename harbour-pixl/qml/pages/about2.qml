@@ -7,7 +7,7 @@ Page {
     SilicaFlickable {
         anchors.fill: parent
         height: parent.height
-        contentHeight: col.height + 10
+        contentHeight: col.height + 20
         id: flick
 
         VerticalScrollDecorator{}
@@ -113,7 +113,7 @@ Page {
 
             Label {
                 id: aboutme
-                text:   'I develop these apps as a hobby. Therefore, please don\'t expect them to work perfect. If you like what I\'m doing, consider liking / commenting the app or following me on twitter. For a developer, knowing that people out there use & like your app is one of the greatest feelings ever.'
+                text:   'I develop these apps as a hobby. Therefore, please don\'t expect them to work perfectly. If you like what I\'m doing, consider liking / commenting the app or following me on twitter. For a developer, knowing that people out there use & like your app is one of the greatest feelings ever.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -130,7 +130,7 @@ Page {
 
             Label {
                 id: body
-                text: 'Font by astramat.com<br>Database derived from \'noto\' by leszek.<br>Thanks to gukke, AL13N, KAOS and all the others who found bugs & shared their ideas.<br>Inspired by \'Disco Zoo\' and \'A dark room\'.<br> Thanks to all of you!'
+                text: 'Font by astramat.com<br>Database derived from \'noto\' by leszek.<br>Thanks to gukke, AL13N, KAOS and all the others who found bugs and shared their ideas.<br>Inspired by \'Disco Zoo\' and \'A dark room\'.<br> Thanks to all of you!'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {

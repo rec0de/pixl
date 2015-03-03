@@ -233,6 +233,22 @@ Page {
             }
 
             SectionHeader {
+                text: "Event logging"
+            }
+
+            Label {
+                text:   'Pixl automatically logs certain events like animal birth, death, or predator events. New log messages are displayed on the main screen by default but you can disable this behaviour in the settings menu. To view the full log, go to Info->Event log. You can also clear the log from the settings page.'
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+            SectionHeader {
                 text: "Debug Mode"
             }
 

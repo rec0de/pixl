@@ -407,10 +407,22 @@ Image {
     function xytodirection(ox, oy){
         var dx = x - ox;
         var dy = y - oy;
+        var newmspeed;
+
+        // Slow down old animals
+        if(page.slowdown && age > 400*slowdownage){
+            var agesquared = age*age;
+            var constant = 0.94*400*slowdownage;
+            var multiplier = (constant*constant)/agesquared;
+            newmspeed = maxspeed * multiplier;
+        }
+        else{
+            newmspeed = maxspeed;
+        }
 
 
         // I am apparently too stupid to solve this with clean math, so...
-        while(Math.abs(dx) + Math.abs(dy) > maxspeed){
+        while(Math.abs(dx) + Math.abs(dy) > newmspeed){
             dx = dx * 0.7;
             dy = dy * 0.7;
         }
@@ -442,7 +454,7 @@ Image {
         else{
             xspeed = absx;
         }
-        if(Math.floor(Math.random()*2) < 0.8){ // Adjust probability to avoid animals grouping on top of screen
+        if(Math.random()*2 < 0.8){ // Adjust probability to avoid animals grouping on top of screen
             yspeed = - absy;
         }
         else{
@@ -460,9 +472,18 @@ Image {
             xspeed = - Math.abs(xspeed);
         }
 
-        if(animal.y < 65){
+        if(animal.y < 70){
             // yspeed has to be positive
             yspeed = Math.abs(yspeed);
+
+            // Avoid small yspeeds
+            if(yspeed < Math.abs(xspeed)){
+                yspeed = Math.abs(xspeed);
+                xspeed = speed - yspeed;
+                if(Math.floor(Math.random()*2) == 1){ // Choose xspeed direction
+                    xspeed = - xspeed;
+                }
+           }
         }
         else if(animal.y > page.height - animal.height - 5){
             // yspeed has to be negative

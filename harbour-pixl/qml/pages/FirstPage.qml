@@ -16,6 +16,7 @@ Page {
     property bool spawnpred: true // Enables/Disables predator spawning
     property bool showmsgs: true // Shows log messages on main screen
     property bool night: false // Indicates nighttime
+    property bool firststart: false // True is game is started for first time after update
     property int foodspawn: 85 // Food spawn probability (per tick)
     property bool daynight: false // Activates day/night cycle
     property bool paused: true // Game is paused
@@ -116,6 +117,7 @@ Page {
         if(DB.getsett(5) < 4 || DB.getsett(5) === -1){
             log('firststart', false, false, false);
             DB.setsett(5, 4);
+            page.firststart = true;
         }
         // Otherwise log ambient message
         else if(page.night){
@@ -194,6 +196,8 @@ Page {
           if(!page.animals[i].local){
             if(!DB.checknonlocal(page.animals[i].id)){
                 // If moose has been sent home, remove moose
+                // Log goodbye message
+                page.log('guest_leave', page.animals[i].name, page.animals[i].dna, page.animals[i].id);
                 page.animals[i].destroy();
                 page.animals.splice(i, 1);
                 i--;
@@ -222,6 +226,8 @@ Page {
                 temp.importfromdna(guestmoose[i].dna);
                 temp.tick(); // Move animal to target coords
                 page.animals.push(temp);
+                // Log guest moose message
+                page.log('guest_enter', guestmoose[i].name, guestmoose[i].dna, false)
             }
         }
 
@@ -328,6 +334,7 @@ Page {
             page.food.push(temp);
         }
 
+
         // Spawn 3 animals on startup
         if(page.animals.length < 3 && !page.debug){
             // Spawn and log only once if there are no moose
@@ -340,6 +347,9 @@ Page {
             else{
                 spawnanimal(true);
             }
+        }
+        else if(page.firststart){
+            log('spawnthree', false, false, false); // Log spawntree msg for updated versions with existing moose
         }
 
 
@@ -408,9 +418,9 @@ Page {
 
         DB.setsett(9, playtime + 2);
 
-        // Log story message randomly (1 in 4 chance every 90 seconds)
-        // Average time for complete story: (4*90*22)/60 = 132min = approx. 2h
-        if((page.playtime % 90) === 0 && Math.floor(Math.random()*4)==1){
+        // Log story message randomly (1 in 5 chance every 80 seconds)
+        // Average time for complete story: (5*90*22)/60 = approx 165min = 2.75h
+        if((page.playtime % 80) === 0 && Math.floor(Math.random()*5)==1){
             var index = DB.getsett(10);
             if(index === -1){
                 index = 0;
@@ -613,6 +623,12 @@ Page {
         else if(event === 'ambient_night'){
             texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the ponds surface, swirling trough the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.'];
         }
+        else if(event === 'guest_enter'){
+            texts = [name+' visits the glade.', name+' visits the clearing. It\'s nice to see a few new faces around here.', name+' visits the clearing.'];
+        }
+        else if(event === 'guest_leave'){
+            texts = [name+' decides to go back home trough the dense forest.', name+' leaves the clearing and heads home.'];
+        }
         else if(event === 'sunrise'){
             texts = ['The sun rises slowly above the treetops. A new day begins.', 'A fresh morning breeze blows trough the grass as the sun begins to rise.', 'Small dewdrops form in the tall grass as the sun rises above the trees.'];
         }
@@ -650,7 +666,6 @@ Page {
         else if(index < storylines.length){
             // If there is story to tell, log story message
             DB.log_add(storylines[index]);
-            console.log(index);
             updatelogmsg(storylines[index]);
             if(index === 21){
                 storytimer.start();
@@ -890,6 +905,7 @@ Page {
         visible: false
         y: -5
         x: -5
+        z: 90000
         color: rect.color
         height: msgtext.height + 30;
         width: rect.width + 10
@@ -922,6 +938,7 @@ Page {
         visible: false
         y: rect.height - 90
         x: 0
+        z: 90000
         color: rect.color
         height: 90
         width: rect.width
