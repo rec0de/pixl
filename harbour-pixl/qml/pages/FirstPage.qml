@@ -350,6 +350,7 @@ Page {
         }
         else if(page.firststart){
             log('spawnthree', false, false, false); // Log spawntree msg for updated versions with existing moose
+            firststart = false;
         }
 
 
@@ -577,7 +578,10 @@ Page {
     function log(event, name, dna, id){
         var texts = new Array();
         var colorlist = new Array('brown', 'dark', 'red', 'beige');
-        var namegender = DB.getnamegender(id);
+
+        if(id !== false){
+            var namegender = DB.getnamegender(id);
+        }
 
         var hisher = (namegender == 1 ? "her" : "his");
         var himher = (namegender == 1 ? "her" : "him");
