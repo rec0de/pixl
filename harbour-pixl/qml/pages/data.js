@@ -17,6 +17,7 @@
 // 10  Story index
 // 11  Spawn predators
 // 12  Show log messages
+// 13  Reverse log order
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {
@@ -33,7 +34,7 @@ function initialize() {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS settings (uid INTEGER UNIQUE, value INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ancestors (dna TEXT, name TEXT, parenta INTEGER, parentb INTEGER, id INTEGER UNIQUE)');
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT, info TEXT,time INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS namegender (id INTEGER UNIQUE, val INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS matetime (id INTEGER UNIQUE, val INTEGER)');
                 });
@@ -72,6 +73,34 @@ function oldnonlocal() {
     var res;
     db.transaction(function(tx) {
         var rs = tx.executeSql('SELECT dna, name, age FROM nonlocal');
+        if (rs.rows.length > 0) {
+            res = rs.rows;
+        } else {
+            res = false;
+        }
+    })
+    return res
+}
+
+
+// Regenerate log table to include timestamp and info text
+function updatelog() {
+    var db = getDatabase();
+    db.transaction(
+                function(tx) {
+                    tx.executeSql('DROP TABLE log');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT, info TEXT,time INTEGER)');
+                });
+    console.log('Updated log table');
+}
+
+// Used to read old log entries before updating
+function log_get_old(){
+    var db = getDatabase();
+    var res;
+    db.transaction(function(tx) {
+        var rs;
+        rs = tx.executeSql('SELECT val FROM log ORDER BY id ASC;');
         if (rs.rows.length > 0) {
             res = rs.rows;
         } else {
@@ -359,7 +388,7 @@ function ancestors_getdata(id) {
     return res;
 }
 
-// Returns an animals parents dna & names (unfinished)
+// Returns an animals parents dna & names
 function ancestors_get(id) {
     var db = getDatabase();
     var res = "";
@@ -387,12 +416,13 @@ function ancestors_get(id) {
 }
 
 // Adds data to event log
-function log_add(text){
+function log_add(text, info){
     var db = getDatabase();
     var res = "";
     var id = getsett(8) + 1;
+    var time = Date.now();
     db.transaction(function(tx) {
-        var rs = tx.executeSql('INSERT INTO log VALUES (?,?);', [id, text]);
+        var rs = tx.executeSql('INSERT INTO log VALUES (?,?,?,?);', [id, text, info, time]);
         if (rs.rowsAffected > 0) {
             res = "OK";
         } else {
@@ -406,11 +436,18 @@ function log_add(text){
 }
 
 // Returns complete event log
-function log_get(){
+function log_get(descending){
     var db = getDatabase();
     var res;
     db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT val FROM log');
+        var rs;
+        if(descending){
+            rs = tx.executeSql('SELECT val, info, time FROM log ORDER BY id DESC;');
+        }
+        else{
+            rs = tx.executeSql('SELECT val, info, time FROM log ORDER BY id ASC;');
+        }
+
         if (rs.rows.length > 0) {
             res = rs.rows;
         } else {

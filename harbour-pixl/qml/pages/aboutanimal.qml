@@ -117,6 +117,23 @@ Page {
 
     }
 
+    function pers3(){ // Social character trait
+        var dna = page.dna;
+        var socialtrait = parseInt(dna.substr(0, 2), 2);
+        if(socialtrait === 0){
+            return 'Helpful';
+        }
+        else if(socialtrait === 1){
+            return 'Egoist';
+        }
+        else if(socialtrait === 2){
+            return 'Unknown';
+        }
+        else if(socialtrait === 3){
+            return 'Unknown';
+        }
+    }
+
     function updatemessage(msg){
         msgtext.text = msg;
         message.visible = true;
@@ -289,6 +306,11 @@ Page {
 
             Label {
                 text: pers2()
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Label {
+                text: pers3()
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 

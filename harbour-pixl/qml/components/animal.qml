@@ -4,10 +4,10 @@ import '../pages/data.js' as DB
 // Animal DNA specs
 //
 // Example DNA:
-// 00|11|000|111|000|1111|000|111|0000|111|000|111|0000|
-// sh co viw mov stl dirc men ens enmv mis mas jpf sedu
+// 00|11|000|111|000|1111|000|111|0000|111|000|111|0000|111|000000
+// so co viw mov stl dirc men ens enmv mis mas jpf sedu sov blank
 //
-// Shape: 1 of 4 shapes
+// Socialtrait: 1 of 4 social character traits
 // Color: 1 of 4 color variations
 // Viewarea: 70 + DNA Value (0-7) * 15
 // Movingchange: 1 + DNA Value (0-7)
@@ -20,6 +20,8 @@ import '../pages/data.js' as DB
 // Energymoving: Energystill * (1 + maxspeed/10) * (1 + DNA Value (0-15)/15)
 // Jumpforce: 7 + DNA Value (0-7)
 // Searchduration: 300 + DNA Value (0-15)*100
+// Socialvalue: DNA Value (0-7), exact usage depends on socialtrait
+// Blank space: Not used for now
 
 
 
@@ -47,6 +49,8 @@ Image {
     property real maxspeed: 4 // Max Walking speed
     property real minspeed: 1 // Min Walking Speed
     property int searchingduration: 500 // Max. duration of searching state
+    property int socialtrait: 0 // Character trait for social interaction 0: helpful 1: egoist  2: todo 3: todo
+    property int socialval: 0 // Additional value for social actions, usage depends on socialtrait
 
     //Not in DNA
     property int yshift: 0
@@ -142,7 +146,7 @@ Image {
 
         // Look for food
         var searchprob = 0.12 * Math.pow(1.068, Math.round((energy / maxenergy)*100)) + 10; // Searching probability, depends on energy
-        if((Math.floor(Math.random()*searchprob) == 10 || searching) && Math.round((energy / maxenergy)*100) < 91){ // Look for food aprox. every 20 ticks (if energy is below 91%)
+        if((chance(searchprob)|| searching) && Math.round((energy / maxenergy)*100) < 91){ // Look for food aprox. every 20 ticks (if energy is below 91%)
             var dist;
 
             // Check for food within viewarea
@@ -185,7 +189,7 @@ Image {
         }
 
         // Look for other moose
-        if(Math.floor(Math.random()*20) == 5){ // Look for moose aprox. every 20 ticks
+        if(chance(20)){ // Look for moose aprox. every 20 ticks
 
             // Check for other moose within viewarea
             for (i = 0; i < page.animals.length; i++){
@@ -209,9 +213,9 @@ Image {
                             if((page.animals[i].age/400) > 81.5 && page.slowdown){
                                 multb += Math.log((page.animals[i].age/400)-80) * 1.5;
                             }
-                            var multplicator = (multa * multb)*5; // 5 if both animals have 100% and youger than 80, higher if animals are hungry
+                            var multiplicator = (multa * multb)*5; // 5 if both animals have 100% and youger than 80, higher if animals are hungry
 
-                            if(!still && !page.animals[i].still && local && page.animals[i].local && age >= grownupage*400 && page.animals[i].age >= grownupage*400 && Math.floor(Math.random()*multplicator) === 1 && DB.getmatetime(id) < page.playtime && DB.getmatetime(page.animals[i].id) < page.playtime){
+                            if(!still && !page.animals[i].still && local && page.animals[i].local && age >= grownupage*400 && page.animals[i].age >= grownupage*400 && chance(multiplicator) && DB.getmatetime(id) < page.playtime && DB.getmatetime(page.animals[i].id) < page.playtime){
 
                                 // Align faces
                                 if(page.animals[i].x > x){
@@ -243,12 +247,29 @@ Image {
                                 DB.setmatetime(id, page.playtime + 60*5);
                                 DB.setmatetime(page.animals[i].id, page.playtime + 60*5);
                             }
-                            else if(Math.floor(Math.random()*10) === 5){ // Otherwise play with other moose with 1/10 probability
-                                //TODO, planned for sometime
+                            else if(chance(5)){ // Otherwise interact with 1/5 probability
+
+                                var ownenergy = energy / maxenergy
+                                var partnerenergy = page.animals[i].energy / page.animals[i].maxenergy;
+
+                                // Feed young (hungry) moose if not egoist and not hungry
+                                if(socialtrait !== 1 && age > 20*400 && page.animals[i].age < 18*400 && partnerenergy < (ownenergy*1.3)){
+                                    var giveenergy = 0.3 * ownenergy * ownenergy
+                                    page.animals[i].energy = page.animals[i].energy + giveenergy;
+                                    energy = energy - giveenergy;
+                                    console.log('Fed '+giveenergy+' to '+animals[i].name);
+                                }
+                                // Feed if partner is hungry and animal is helpful with 1/2 chance
+                                else if(socialtrait === 0 && chance(2) && partnerenergy < ownenergy){
+                                    giveenergy = 0.23 * ownenergy * ownenergy
+                                    page.animals[i].energy = page.animals[i].energy + giveenergy;
+                                    energy = energy - giveenergy;
+                                    console.log('Fed '+giveenergy+' to moose.');
+                                }
                             }
                         }
                         else{
-                          if(Math.floor(Math.random()*10) === 1){
+                          if(chance(10)){
                             xytodirection(page.animals[i].x + 50, page.animals[i].y);
                           }
                         }
@@ -260,7 +281,7 @@ Image {
         }
 
         // Look for predators
-        if(page.predators.length > 0 && Math.floor(Math.random()*animal.attention) === 1){
+        if(page.predators.length > 0 && chance(animal.attention)){
             // Check for other moose within viewarea
             for (i = 0; i < page.predators.length; i++){
                 dist = -1;
@@ -277,7 +298,7 @@ Image {
 
 
         // Log message if starving
-        if(Math.round((animal.energy / animal.maxenergy)*100) < 25 && starvelog){
+        if(Math.round((animal.energy / animal.maxenergy)*100) < 25 && starvelog && animal.energy > 0){
             starvelog = false;
             starvelogger.start();
             page.log('starving', animal.name, animal.dna, animal.id)
@@ -350,6 +371,15 @@ Image {
 
     // End tick function
 
+    function chance(probability){
+        if(Math.floor(Math.random()*probability) === 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     function die(){
         source = '../img/tombstone.png';
         shadow.visible = false;
@@ -367,14 +397,24 @@ Image {
 
     function importfromdna(dna){
         if(dna.length === 40){
+            for(var i = 0; i < 9; i++){
+                if(Math.floor(Math.random()*2) === 1){
+                    dna += '1';
+                }
+                else{
+                    dna += '0';
+                }
+            }
+
+            importfromdna(dna)
+        }
+        else if(dna.length === 49){
             animal.dna = dna;
 
-            var shape = dna.substr(0, 2);
             var basepath = '../img/moose';
 
             var color = parseInt(dna.substr(2, 2), 2) + 1;
             source = basepath + color + '.png';
-
             viewarea = 70 + parseInt(dna.substr(4, 3), 2) * 15;
             movingchange = 1 + parseInt(dna.substr(7, 3), 2);
             stillchange = 1 + parseInt(dna.substr(10, 3), 2);
@@ -386,6 +426,11 @@ Image {
             energymoving = energystill * (1 + maxspeed / 10) * (1 + parseInt(dna.substr(24, 4), 2)/15)
             jumpforce = 7 + parseInt(dna.substr(33, 3), 2);
             searchingduration = 300 + parseInt(dna.substr(36, 4), 2)*100;
+            socialtrait = parseInt(dna.substr(0, 2), 2);
+            socialval = parseInt(dna.substr(40, 3), 2);
+        }
+        else{
+            console.log('DNA import failed. '+dna+' '+dna.length);
         }
     }
 
@@ -448,7 +493,7 @@ Image {
         var absy = speed - absx;
 
         // Determine if each value is negative / positive
-        if(Math.floor(Math.random()*2) == 1){
+        if(chance(2)){
             xspeed = - absx;
         }
         else{
@@ -480,7 +525,7 @@ Image {
             if(yspeed < Math.abs(xspeed)){
                 yspeed = Math.abs(xspeed);
                 xspeed = speed - yspeed;
-                if(Math.floor(Math.random()*2) == 1){ // Choose xspeed direction
+                if(chance(2)){ // Choose xspeed direction
                     xspeed = - xspeed;
                 }
            }
@@ -492,12 +537,12 @@ Image {
     }
 
     function combinedna(dna1, dna2){
-        var crossoverpoint = Math.floor(Math.random()*40);
+        var crossoverpoint = Math.floor(Math.random()*49);
         var part1;
         var part2;
 
         // Crossover
-        if(Math.floor(Math.random()*2) == 1){
+        if(chance(2)){
           part1 = dna1.substr(crossoverpoint);
           part2 = dna2.substr(0, crossoverpoint);
         }
@@ -515,7 +560,7 @@ Image {
 
     function mutate(dna){
         for(var i = 0; i < dna.length; i++){
-           if(Math.floor(Math.random()*100) == 1){
+           if(chance(100)){
                if(dna[i] === '1'){
                    dna = dna.substr(0, i) + '0' + dna.substr(i+1);
                }

@@ -65,7 +65,22 @@ Page {
             DB.setsett(5, 3);
         }
 
+        // Update log table if necessary
+        if(DB.getsett(5) < 5 || DB.getsett(5) === -1){
 
+            var oldlogs = DB.log_get_old();
+
+            DB.updatelog();
+
+            // Save old logs to new table
+            if(oldlogs !== false){
+                for(i = 0; i < oldlogs.length; i++){
+                    DB.log_add(oldlogs[i].val, 'Unknown');
+                }
+            }
+
+            DB.setsett(5, 5);
+        }
 
         // Load local animals from DB
         var data = DB.getall();
@@ -291,6 +306,9 @@ Page {
                 }
             }
 
+            // Hide startup message
+            logmsg.visible = false;
+
             // Start Timers & reset labels
             page.paused = false;
             animalstats.visible = false;
@@ -500,7 +518,7 @@ Page {
     function randna(){
         var i;
         var dna = '';
-        for(i = 0; i < 40; i++){
+        for(i = 0; i < 49; i++){
             if(Math.floor(Math.random()*2) == 1){
                 dna += '1';
             }
@@ -646,9 +664,35 @@ Page {
             texts = ['Your story begins on a small clearing in a dark forest.', 'This is where it all starts. A small clearing in the woods.', 'This is the beginning of your story. A small glade in the endless forest.'];
         }
 
+        // Generate info text
+        var infotext = '';
+
+        if(event === 'spawn'){
+            infotext = name+' appears.';
+        }
+        else if(event === 'starving'){
+            infotext = name+' has < 25% energy.';
+        }
+        else if(event === 'birth'){
+            var parents = DB.ancestors_get(id);
+            infotext = name+' is born. Parents: '+parents[0]+' and '+parents[2];
+        }
+        else if(event === 'death'){
+            infotext = name+' dies.';
+        }
+        else if(event === 'pred_kill'){
+            infotext = name+' is killed.'
+        }
+        else if(event === 'guest_enter'){
+            infotext = 'Guest moose '+name+' appears.';
+        }
+        else if(event === 'guest_leave'){
+            infotext = 'Guest moose '+name+' leaves.';
+        }
+
         // Choose random text & save to log
         var index = Math.floor(Math.random()*texts.length);
-        DB.log_add(texts[index]);
+        DB.log_add(texts[index], infotext);
         updatelogmsg(texts[index]);
     }
 
@@ -669,7 +713,7 @@ Page {
         }
         else if(index < storylines.length){
             // If there is story to tell, log story message
-            DB.log_add(storylines[index]);
+            DB.log_add(storylines[index], '');
             updatelogmsg(storylines[index]);
             if(index === 21){
                 storytimer.start();
@@ -959,7 +1003,8 @@ Page {
 
         onA_dnaChanged: {
             charactera.text = pers1(a_dna);
-            characterb.text = pers2(a_dna)
+            characterb.text = pers2(a_dna);
+            characterc.text = pers3(a_dna);
         }
 
         Column{
@@ -997,6 +1042,12 @@ Page {
             }
             Label {
                 id: characterb
+                text: 'Unknown'
+                font.pixelSize: 24
+                font.family: pixels.name
+            }
+            Label {
+                id: characterc
                 text: 'Unknown'
                 font.pixelSize: 24
                 font.family: pixels.name
@@ -1057,6 +1108,22 @@ Page {
             return 'Hyperactive';
         }
 
+    }
+
+    function pers3(dna){ // Social character trait
+        var socialtrait = parseInt(dna.substr(0, 2), 2);
+        if(socialtrait === 0){
+            return 'Helpful';
+        }
+        else if(socialtrait === 1){
+            return 'Egoist';
+        }
+        else if(socialtrait === 2){
+            return 'Unknown';
+        }
+        else if(socialtrait === 3){
+            return 'Unknown';
+        }
     }
 
     // Endgame UI & Logic

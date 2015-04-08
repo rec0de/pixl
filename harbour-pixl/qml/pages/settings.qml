@@ -32,6 +32,10 @@ Page {
             showmsg.checked = true;
         }
 
+        if(DB.getsett(13) != 0){
+            logorder.checked = true;
+        }
+
         if(DB.getsett(3) != -1){
             foodrate.value = DB.getsett(3);
         }
@@ -49,8 +53,8 @@ Page {
     }
 
     function switchdebug(){
-        var dbug = DB.getsett(1);
-        if(dbug != 1){
+        var val = DB.getsett(1);
+        if(val != 1){
             DB.setsett(1, 1); // Activate Debug
             debug.checked = true;
         }
@@ -61,8 +65,8 @@ Page {
     }
 
     function switchslowage(){
-        var slow = DB.getsett(2);
-        if(slow != 0){
+        var val = DB.getsett(2);
+        if(val != 0){
             DB.setsett(2, 0); // Deactivate Slowdown
             slowage.checked = false;
         }
@@ -73,8 +77,8 @@ Page {
     }
 
     function switchpred(){
-        var pred = DB.getsett(11);
-        if(pred != 0){
+        var val = DB.getsett(11);
+        if(val != 0){
             DB.setsett(11, 0); // Deactivate predators
             spawnpred.checked = false;
         }
@@ -85,14 +89,26 @@ Page {
     }
 
     function switchmsg(){
-        var pred = DB.getsett(12);
-        if(pred != 0){
+        var val = DB.getsett(12);
+        if(val != 0){
             DB.setsett(12, 0); // Deactivate messages
             showmsg.checked = false;
         }
         else{
             DB.setsett(12, 1); // Activate messages
             showmsg.checked = true;
+        }
+    }
+
+    function switchlogorder(){
+        var val = DB.getsett(13);
+        if(val != 0){
+            DB.setsett(13, 0); // Show oldest first
+            logorder.checked = false;
+        }
+        else{
+            DB.setsett(13, 1); // Show newest first
+            logorder.checked = true;
         }
     }
 
@@ -155,6 +171,17 @@ Page {
                 checked: false
                 onClicked: {
                     switchmsg()
+                }
+            }
+
+            TextSwitch {
+                id: logorder
+                text: "Reverse log message order"
+                description: "Shows newest messages first"
+                automaticCheck: false
+                checked: false
+                onClicked: {
+                    switchlogorder()
                 }
             }
 

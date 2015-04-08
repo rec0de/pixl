@@ -11,7 +11,9 @@ Display debug info on animal stats page (done)
 
 Better stats / character traits (done)
 
-Social interaction
+Option to reverse log order (done)
+
+Social interaction (in progress)
 
 ## User-requested features
 
@@ -55,9 +57,13 @@ Make old animals less likely to mate (done)
 
 Fix mating reset on restart (done)
 
-Add event log (mostly done)
+Add event log (done)
 
-Add predators (mostly done)
+Add predators (done)
+
+Add info text on event log (done)
+
+More social interaction (in progress)
 
 Add other death causes (planned)
 
@@ -66,5 +72,3 @@ Improve animal movement
 More stats
 
 Seasons -> Adjust food rate depending on season
-
-More social interaction
