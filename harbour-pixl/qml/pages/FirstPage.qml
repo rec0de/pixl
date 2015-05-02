@@ -241,7 +241,7 @@ Page {
                 temp.tick(); // Move animal to target coords
                 page.animals.push(temp);
                 // Log guest moose message
-                page.log('guest_enter', guestmoose[i].name, guestmoose[i].dna, false. false)
+                page.log('guest_enter', guestmoose[i].name, guestmoose[i].dna, false, false)
             }
         }
 
