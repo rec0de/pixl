@@ -34,7 +34,7 @@ function initialize() {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS settings (uid INTEGER UNIQUE, value INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS nonlocal (dna TEXT, name TEXT, age INTEGER, id INTEGER UNIQUE)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ancestors (dna TEXT, name TEXT, parenta INTEGER, parentb INTEGER, id INTEGER UNIQUE)');
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT, info TEXT,time INTEGER)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT, info TEXT, mooseid INTEGER,time INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS namegender (id INTEGER UNIQUE, val INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS matetime (id INTEGER UNIQUE, val INTEGER)');
                 });
@@ -89,7 +89,7 @@ function updatelog() {
     db.transaction(
                 function(tx) {
                     tx.executeSql('DROP TABLE log');
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT, info TEXT,time INTEGER)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT, info TEXT, mooseid INTEGER, time INTEGER)');
                 });
     console.log('Updated log table');
 }
@@ -154,11 +154,13 @@ function getname(id) {
         if (rs.rows.length > 0) {
             res = rs.rows.item(0).name;
         } else {
-            res = '-1';
+            res = false;
         }
     })
     return res
 }
+
+
 
 // This function is used to retrieve animal ages from the database
 function getage(id) {
@@ -263,7 +265,7 @@ function getnonlocal() {
     db.transaction(function(tx) {
         var rs = tx.executeSql('SELECT id, dna, name, age FROM nonlocal');
         if (rs.rows.length > 0) {
-            //console.log('Loading ' + rs.rows.length + 'animals from db');
+            //console.log('Loading ' + rs.rows.length + 'animals from nonlocal db');
             res = rs.rows;
         } else {
             res = false;
@@ -416,13 +418,13 @@ function ancestors_get(id) {
 }
 
 // Adds data to event log
-function log_add(text, info){
+function log_add(text, info, mid){
     var db = getDatabase();
     var res = "";
     var id = getsett(8) + 1;
     var time = Date.now();
     db.transaction(function(tx) {
-        var rs = tx.executeSql('INSERT INTO log VALUES (?,?,?,?);', [id, text, info, time]);
+        var rs = tx.executeSql('INSERT INTO log VALUES (?,?,?,?,?);', [id, text, info, mid, time]);
         if (rs.rowsAffected > 0) {
             res = "OK";
         } else {
@@ -442,10 +444,10 @@ function log_get(descending){
     db.transaction(function(tx) {
         var rs;
         if(descending){
-            rs = tx.executeSql('SELECT val, info, time FROM log ORDER BY id DESC;');
+            rs = tx.executeSql('SELECT val, info, time, mooseid FROM log ORDER BY id DESC;');
         }
         else{
-            rs = tx.executeSql('SELECT val, info, time FROM log ORDER BY id ASC;');
+            rs = tx.executeSql('SELECT val, info, time, mooseid FROM log ORDER BY id ASC;');
         }
 
         if (rs.rows.length > 0) {

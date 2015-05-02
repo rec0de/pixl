@@ -75,7 +75,23 @@ Page {
             }
 
             Label {
-                text:   'Character traits are calculated from your animals DNA. The trait that matches best with the DNA will be displayed on the animals stats and quick info page. The value in brackets behind the trait represents the '
+                text:   'Character traits are calculated from your animals DNA. The trait that matches best with the DNA will be displayed on the animals stats and quick info page. The value in brackets behind the trait represents how well the moose matches the given trait.'
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+            SectionHeader {
+                text: "Social traits"
+            }
+
+            Label {
+                text:   '[TODO]'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -237,7 +253,7 @@ Page {
             }
 
             Label {
-                text:   'Pixl automatically logs certain events like animal birth, death, or predator events. New log messages are displayed on the main screen by default but you can disable this behaviour in the settings menu. To view the full log, go to Info->Event log. You can also clear the log from the settings page.'
+                text:   'Pixl automatically logs certain events like animal birth, death, or predator events. New log messages are displayed on the main screen by default but you can disable this behaviour in the settings menu. To view the full log, go to Info->Event log. You can also clear the log from the settings page. In the full event log, you can get more information on individual messages by pressing a log entry. Animal-specific messages will redirect you to the animals stats page if you tap the additional info menu.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {

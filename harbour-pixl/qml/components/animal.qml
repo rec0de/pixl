@@ -254,17 +254,24 @@ Image {
 
                                 // Feed young (hungry) moose if not egoist and not hungry
                                 if(socialtrait !== 1 && age > 20*400 && page.animals[i].age < 18*400 && partnerenergy < (ownenergy*1.3)){
-                                    var giveenergy = 0.3 * ownenergy * ownenergy
+                                    var giveenergy = 0.3 * ownenergy * ownenergy * energy
                                     page.animals[i].energy = page.animals[i].energy + giveenergy;
                                     energy = energy - giveenergy;
                                     console.log('Fed '+giveenergy+' to '+animals[i].name);
                                 }
                                 // Feed if partner is hungry and animal is helpful with 1/2 chance
-                                else if(socialtrait === 0 && chance(2) && partnerenergy < ownenergy){
-                                    giveenergy = 0.23 * ownenergy * ownenergy
+                                else if(false && socialtrait === 0 && chance(2) && partnerenergy < ownenergy){ // Deactivated for now, WIP
+                                    giveenergy = 0.23 * ownenergy * ownenergy * energy
                                     page.animals[i].energy = page.animals[i].energy + giveenergy;
                                     energy = energy - giveenergy;
                                     console.log('Fed '+giveenergy+' to moose.');
+                                }
+                                // Steal food if egoist with 1/5 chance
+                                else if(false && socialtrait === 1 && chance(5) && partnerenergy > ownenergy){ // Deactivated for now, WIP
+                                    var takeenergy = 0.1 * partnerenergy * partnerenergy * page.animals[i].energy;
+                                    page.animals[i].energy = page.animals[i].energy - giveenergy;
+                                    energy = energy + giveenergy;
+                                    console.log('Stole '+giveenergy+' from moose.');
                                 }
                             }
                         }
@@ -301,7 +308,7 @@ Image {
         if(Math.round((animal.energy / animal.maxenergy)*100) < 25 && starvelog && animal.energy > 0){
             starvelog = false;
             starvelogger.start();
-            page.log('starving', animal.name, animal.dna, animal.id)
+            page.log('starving', animal.name, animal.dna, animal.id, animal.local)
         }
 
         // Move animal
@@ -387,10 +394,10 @@ Image {
 
         // Log death
         if(predkill){
-            page.log('pred_kill', animal.name, animal.dna, animal.id)
+            page.log('pred_kill', animal.name, animal.dna, animal.id, animal.local)
         }
         else{
-            page.log('death', animal.name, animal.dna, animal.id)
+            page.log('death', animal.name, animal.dna, animal.id, animal.local)
         }
         destroy(8000);
     }

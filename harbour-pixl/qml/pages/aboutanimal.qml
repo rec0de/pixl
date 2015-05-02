@@ -27,6 +27,15 @@ Page {
             page.debug = false;
         }
 
+        // Attempt to get data from ancestors DB
+        if(local){
+            var data = DB.ancestors_getdata(page.id);
+            if(data !== false){
+                page.name = data.name;
+                page.dna = data.dna;
+            }
+        }
+
         var dna = page.dna;
         var basepath = '../img/moose';
         var color = parseInt(dna.substr(2, 2), 2) + 1;
@@ -59,16 +68,17 @@ Page {
             parentimageb.source = '../img/moose' + (parseInt(parents[3].substr(2, 2), 2) + 1) + '.png';
         }
 
-        // Show age for ancestor view
-        if(page.ancestor){
+        // Get age from DB
+        if(local){
             if(DB.getage(page.id) !== false){
-                agetext.text = Math.round(DB.getage(id)/400);
+                page.age = Math.round(DB.getage(id)/400);
+                agetext.text = page.age;
             }
             else{
-                agetext.text = 'Deceased'
+                agetext.text = 'Deceased';
+                page.ancestor = true;
             }
         }
-
     }
 
     function pers1(){
@@ -310,6 +320,7 @@ Page {
             }
 
             Label {
+                visible: false // Work in progress
                 text: pers3()
                 anchors.horizontalCenter: parent.horizontalCenter
             }

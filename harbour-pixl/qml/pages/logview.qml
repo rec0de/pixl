@@ -27,7 +27,7 @@ Page {
         page.log = DB.log_get(descending);
 
         for(var i = 0; i < page.log.length; i++){
-            listModel.append({"name": page.log[i].val, "info": page.log[i].info, "time": page.log[i].time})
+            listModel.append({"name": page.log[i].val, "info": page.log[i].info, "time": page.log[i].time, "mid": page.log[i].mooseid});
         }
     }
 
@@ -70,7 +70,17 @@ Page {
                         anchors.horizontalCenter: parent.horizontalCenter
                         color: Theme.highlightColor
                         font.pixelSize: Theme.fontSizeMedium
-                        text: info
+                        text: (info) ? info : ' ';
+                        visible: (info) ? true : false;
+
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                if(mid && mid !== -1){
+                                    pageStack.push(Qt.resolvedUrl("aboutanimal.qml"), {local: true, id: mid});
+                                }
+                            }
+                        }
                     }
                     Label{
                         anchors.horizontalCenter: parent.horizontalCenter

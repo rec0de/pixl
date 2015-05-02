@@ -138,7 +138,7 @@ CoverBackground {
     }
 
     Image {
-        source: "../img/moose.png"
+        source: "../img/moose1.png"
         mirror: false
         id: animal
         opacity: 1

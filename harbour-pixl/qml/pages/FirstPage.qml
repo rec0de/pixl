@@ -75,7 +75,7 @@ Page {
             // Save old logs to new table
             if(oldlogs !== false){
                 for(i = 0; i < oldlogs.length; i++){
-                    DB.log_add(oldlogs[i].val, 'Unknown');
+                    DB.log_add(oldlogs[i].val, 'Unknown', -1);
                 }
             }
 
@@ -130,16 +130,15 @@ Page {
 
         // Log starting message on first startup or after update
         if(DB.getsett(5) < 4 || DB.getsett(5) === -1){
-            log('firststart', false, false, false);
             DB.setsett(5, 4);
             page.firststart = true;
         }
         // Otherwise log ambient message
         else if(page.night){
-            log('ambient_night', false, false, false);
+            log('ambient_night', false, false, false, false);
         }
         else{
-            log('ambient_day', false, false, false);
+            log('ambient_day', false, false, false, false);
         }
     }
 
@@ -212,7 +211,7 @@ Page {
             if(!DB.checknonlocal(page.animals[i].id)){
                 // If moose has been sent home, remove moose
                 // Log goodbye message
-                page.log('guest_leave', page.animals[i].name, page.animals[i].dna, page.animals[i].id);
+                page.log('guest_leave', page.animals[i].name, page.animals[i].dna, page.animals[i].id, false);
                 page.animals[i].destroy();
                 page.animals.splice(i, 1);
                 i--;
@@ -229,7 +228,7 @@ Page {
             loaded = false;
 
             for(var j = 0; j < page.animals.length; j++){
-                if(page.animals[j].dna === guestmoose[i].dna && page.animals[j].name === guestmoose[i].name){
+                if(!page.animals[j].local && page.animals[j].id === guestmoose[i].id){
                     // Moose is already loaded
                     loaded = true;
                     break;
@@ -237,12 +236,12 @@ Page {
             }
             if(!loaded){
                 // If moose is not loaded, load moose
-                var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: guestmoose[i].name, age: guestmoose[i].age, local: false});
+                var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: guestmoose[i].name, age: guestmoose[i].age, id: guestmoose[i].id, local: false});
                 temp.importfromdna(guestmoose[i].dna);
                 temp.tick(); // Move animal to target coords
                 page.animals.push(temp);
                 // Log guest moose message
-                page.log('guest_enter', guestmoose[i].name, guestmoose[i].dna, false)
+                page.log('guest_enter', guestmoose[i].name, guestmoose[i].dna, false. false)
             }
         }
 
@@ -304,6 +303,17 @@ Page {
                 if(page.animals[i].local){
                     page.animals[i].name = DB.getname(page.animals[i].id);
                 }
+
+                // Easter Egg / Inside joke
+                var color;
+                if(page.animals[i].name === 'Eli'){
+                    color = parseInt(page.animals[i].dna.substr(2, 2), 2) + 1;
+                    page.animals[i].source = '../img/eegg' + color + '.png';
+                }
+                else{
+                    color = parseInt(page.animals[i].dna.substr(2, 2), 2) + 1;
+                    page.animals[i].source = '../img/moose' + color + '.png';
+                }
             }
 
             // Hide startup message
@@ -357,17 +367,19 @@ Page {
         if(page.animals.length < 3 && !page.debug){
             // Spawn and log only once if there are no moose
             if(page.animals.length === 0){
-                log('spawnthree', false, false, false);
+                log('spawnthree', false, false, false, false);
                 spawnanimal(false);
                 spawnanimal(false);
                 spawnanimal(false);
             }
             else{
-                spawnanimal(true);
+                if(spawndelayer.running === false){
+                    spawndelayer.start(); // Avoid spawning new animal directly after death
+                }
             }
         }
         else if(page.firststart){
-            log('spawnthree', false, false, false); // Log spawntree msg for updated versions with existing moose
+            log('spawnthree', false, false, false, false); // Log spawntree msg for updated versions with existing moose
             firststart = false;
         }
 
@@ -473,7 +485,7 @@ Page {
         DB.setsett(6, id+1); // Increment nextid
         DB.ancestors_add(dna, name, id, -1, -1) // Add ancestor entry with unknown parents
         if(writelog){
-            log('spawn', name, dna, id); // Log spawning
+            log('spawn', name, dna, id, true); // Log spawning
         }
     }
 
@@ -493,7 +505,7 @@ Page {
         DB.setnamegender(id, namegender);
         DB.setsett(6, id+1); // Increment nextid
         DB.ancestors_add(dna, name, id, parenta, parentb) // Add ancestor entry given parents
-         log('birth', name, dna, id); // Log birth
+         log('birth', name, dna, id, true); // Log birth
     }
 
     function spawnpredator(){
@@ -511,7 +523,7 @@ Page {
             var temp = animal_comp.createObject(page, {x: x, absy: Math.floor(Math.random()*(page.height-60)+60)});
             temp.generate();
             page.predators.push(temp);
-            log('pred_spawn', false, false, false);
+            log('pred_spawn', false, false, false, false);
         }
     }
 
@@ -557,7 +569,7 @@ Page {
             if(midnight < 18000 || midnight > 66000){
                 // If state has changed from day to night, log sundown
                 if(timecycler.prevtime !== -1 && (!(timecycler.prevtime < 18000 || timecycler.prevtime > 66000))){
-                    log('sundown', false, false, false);
+                    log('sundown', false, false, false, false);
                 }
                 pond.source = '../img/pond_night.png';
                 page.night = true;
@@ -565,7 +577,7 @@ Page {
             else{
                 // If state has changed from day to night, log sunrise
                 if(timecycler.prevtime !== -1 && (timecycler.prevtime < 18000 || timecycler.prevtime > 66000)){
-                    log('sunrise', false, false, false);
+                    log('sunrise', false, false, false, false);
                 }
                 pond.source = '../img/pond_day.png';
                 page.night = false;
@@ -593,7 +605,7 @@ Page {
 
 
     // Contains log texts for various events
-    function log(event, name, dna, id){
+    function log(event, name, dna, id, local){
         var texts = new Array();
         var colorlist = new Array('brown', 'dark', 'red', 'beige');
 
@@ -690,9 +702,14 @@ Page {
             infotext = 'Guest moose '+name+' leaves.';
         }
 
+        var mooseid = -1;
+        if(id !== false && local !== false){
+            mooseid = id;
+        }
+
         // Choose random text & save to log
         var index = Math.floor(Math.random()*texts.length);
-        DB.log_add(texts[index], infotext);
+        DB.log_add(texts[index], infotext, mooseid);
         updatelogmsg(texts[index]);
     }
 
@@ -769,6 +786,13 @@ Page {
         repeat: true
         onTriggered: timecycle()
         property int prevtime: -1
+    }
+
+    Timer{
+        id: spawndelayer
+        interval: 2500
+        repeat: false
+        onTriggered: spawnanimal(true)
     }
 
     Rectangle {
@@ -1047,6 +1071,7 @@ Page {
                 font.family: pixels.name
             }
             Label {
+                visible: false // Work in progress
                 id: characterc
                 text: 'Unknown'
                 font.pixelSize: 24
