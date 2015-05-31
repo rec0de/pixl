@@ -73,7 +73,7 @@ Image {
     property bool starvelog: true // Used for logging cooldown
     property bool predkill: false // True if killed by predator
     property int slowdownage: 90 // Animal will be slowed down from this age on (age in user unit, internal units are 400 times larger)
-    property int grownupage: 20 // Animal will be slowed down from this age on (age in user unit, internal units are 400 times larger)
+    property int grownupage: 20 // Animal will be considered grown-up from this age on (age in user unit, internal units are 400 times larger)
     property int matecooldown: 60*5*1000 // 5 minutes 'cooldown'
     property int attention: 10 // How often animal looks for predators, lower is better
 
@@ -96,7 +96,7 @@ Image {
     }
 
     Text{
-        id: name
+        id: nametext
         visible: false
         x: 50
         text: parent.name + ( parent.local ? '' : ' (g)') + '<br>' + Math.round((parent.energy / parent.maxenergy)*100) + '%' // Display name (add guest indicator if needed) and energy
@@ -256,6 +256,11 @@ Image {
                                 if(socialtrait !== 1 && age > 20*400 && page.animals[i].age < 18*400 && partnerenergy < (ownenergy*1.3)){
                                     var giveenergy = 0.3 * ownenergy * ownenergy * energy
                                     page.animals[i].energy = page.animals[i].energy + giveenergy;
+
+                                    if(page.animals[i].energy > page.animals[i].maxenergy){
+                                        page.animals[i].energy = page.animals[i].maxenergy; // Avoid higher than 100% energy
+                                    }
+
                                     energy = energy - giveenergy;
                                     console.log('Fed '+giveenergy+' to '+animals[i].name);
                                 }
@@ -263,6 +268,11 @@ Image {
                                 else if(false && socialtrait === 0 && chance(2) && partnerenergy < ownenergy){ // Deactivated for now, WIP
                                     giveenergy = 0.23 * ownenergy * ownenergy * energy
                                     page.animals[i].energy = page.animals[i].energy + giveenergy;
+
+                                    if(page.animals[i].energy > page.animals[i].maxenergy){
+                                        page.animals[i].energy = page.animals[i].maxenergy; // Avoid higher than 100% energy
+                                    }
+
                                     energy = energy - giveenergy;
                                     console.log('Fed '+giveenergy+' to moose.');
                                 }
@@ -271,12 +281,17 @@ Image {
                                     var takeenergy = 0.1 * partnerenergy * partnerenergy * page.animals[i].energy;
                                     page.animals[i].energy = page.animals[i].energy - giveenergy;
                                     energy = energy + giveenergy;
+
+                                    if(energy > maxenergy){
+                                        energy = maxenergy; // Avoid higher than 100% energy
+                                    }
+
                                     console.log('Stole '+giveenergy+' from moose.');
                                 }
                             }
                         }
                         else{
-                          if(chance(10)){
+                          if(chance(10) || (age < 400 * grownupage && chance(Math.pow(2, Math.round(age/2000)) + 1))){ // Young moose tend to stay near others, formula: chance = 2^(0.2 * (age/400)) + 1
                             xytodirection(page.animals[i].x + 50, page.animals[i].y);
                           }
                         }
@@ -443,7 +458,7 @@ Image {
 
     function showname(){
         // Toggle nametag
-        name.visible = !name.visible;
+        nametext.visible = !nametext.visible;
         if(page.paused){
             // Display animal info
             animalstats.a_name = animal.name;

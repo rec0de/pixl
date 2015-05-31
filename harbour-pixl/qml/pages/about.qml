@@ -137,11 +137,45 @@ Page {
         delegate: BackgroundItem {
             id: delegate
 
-            Label {
-                x: Theme.paddingLarge
-                text: local ? name : name + ' (g)'
-                anchors.verticalCenter: parent.verticalCenter
-                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
+            Row{
+                width: parent.width
+
+                Rectangle{
+                    // Spacer
+                    height: parent.height
+                    width: Theme.paddingMedium
+                    color: 'transparent'
+                }
+
+                Rectangle{
+                    color: animal ? Theme.highlightColor : 'transparent'
+                    height: parent.height
+                    width: height
+                    radius: 90
+
+                    Image{
+                        source: !animal ? '../img/moose_sw.png' : '../img/moose'+(parseInt(dna.substr(2, 2), 2) + 1)+'.png'
+                        visible: animal
+                        smooth: false
+                        height: Math.round(0.9 * (parent.height / Math.sqrt(2))) // Fit in Circle
+                        width: Math.round(0.9 * (parent.width / Math.sqrt(2)))
+                        anchors.centerIn: parent
+                    }
+                }
+
+                Rectangle{
+                    // Spacer
+                    height: parent.height
+                    width: Theme.paddingMedium
+                    color: 'transparent'
+                }
+
+                Label {
+                    x: Theme.paddingLarge
+                    text: local ? name : name + ' (g)'
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
+                }
             }
 
             onClicked:{

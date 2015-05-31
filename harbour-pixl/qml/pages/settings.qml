@@ -217,7 +217,10 @@ Page {
 
             RemorsePopup {
                 id: remorse
-                onTriggered: DB.hardreset()
+                onTriggered: {
+                    DB.hardreset();
+                    Qt.quit();
+                }
             }
 
             RemorsePopup {

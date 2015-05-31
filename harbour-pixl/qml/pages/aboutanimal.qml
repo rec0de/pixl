@@ -150,7 +150,7 @@ Page {
     }
 
     function upload() {
-        var url = 'https://cdown.pf-control.de/pixl/upload.php?dna='+page.dna+'&name='+page.name+'&age='+page.age; // alias domain for rec0de.net with valid SSL cert
+        var url = 'https://cdown.pf-control.de/pixl/upload.php?dna='+page.dna+'&name='+page.name+'&age='+(page.age*400); // alias domain for rec0de.net with valid SSL cert
 
         var xhr = new XMLHttpRequest();
         xhr.timeout = 1000;
@@ -248,7 +248,18 @@ Page {
                 visible: !page.local
                 text: "Send home"
                 onClicked: {
-                    DB.delnonlocal(page.id) // Remove non-local animal
+                    DB.delnonlocal(page.id); // Remove non-local animal
+                    closer.start();
+                }
+
+                Timer{
+                    id: closer
+                    interval: 300
+                    running: false
+                    repeat: false
+                    onTriggered:{
+                        pageStack.pop();
+                    }
                 }
             }
         }
