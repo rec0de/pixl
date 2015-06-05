@@ -18,6 +18,8 @@
 // 11  Spawn predators
 // 12  Show log messages
 // 13  Reverse log order
+// 14  Left empty for consistency with cross platform version
+// 15  1 if last log message was ambient message
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {

@@ -652,10 +652,10 @@ Page {
             texts = ['The predator attacks '+name+'. '+heshe.capitalize()+' hasn\'t got a chance.', name+' is lying on the ground, lifeless. '+hisher.capitalize()+' '+color+' fur is stained with dark red blood.', 'The predator jumps on '+name+', digging its long sharp teeth deep into '+hisher+' fur. '+heshe.capitalize()+'\'s dead within a few seconds.'];
         }
         else if(event === 'ambient_day'){
-            texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple trough the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.'];
+            texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple trough the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.', 'You see the treetops above you slowly dancing in the wind.'];
         }
         else if(event === 'ambient_night'){
-            texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the ponds surface, swirling trough the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.'];
+            texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the ponds surface, swirling trough the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.', 'The small pond seems to glow slightly in the pale moonlight.'];
         }
         else if(event === 'guest_enter'){
             texts = [name+' visits the glade.', name+' visits the clearing. It\'s nice to see a few new faces around here.', name+' visits the clearing.'];
@@ -709,7 +709,17 @@ Page {
 
         // Choose random text & save to log
         var index = Math.floor(Math.random()*texts.length);
-        DB.log_add(texts[index], infotext, mooseid);
+
+        // Avoid logging 2 consecutive ambient messages
+        if(!(DB.getsett(15) == 1 && (event === 'ambient_day' || event === 'ambient_night'))){
+           DB.log_add(texts[index], infotext, mooseid);
+           if(event === 'ambient_day' || event === 'ambient_night'){
+               DB.setsett(15, 1);
+           }
+           else{
+               DB.setsett(15, 0);
+           }
+        }
         updatelogmsg(texts[index]);
     }
 
