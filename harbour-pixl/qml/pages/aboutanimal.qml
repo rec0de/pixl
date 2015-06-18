@@ -111,9 +111,9 @@ Page {
         var directionchange = parseInt(dna.substr(13, 4), 2)/16;
         var searchingduration = parseInt(dna.substr(36, 4), 2)/16;
 
-        var lazy = stillchange*4 - movingchange;
-        var clever = viewarea*2 + searchingduration*2;
-        var hyperactive = (1 + movingchange)*(1 + directionchange) - stillchange;
+        var lazy = movingchange*4 - stillchange*1.2;
+        var clever = viewarea*1.8 + searchingduration*1.8;
+        var hyperactive = (stillchange*2)+(directionchange*2) - movingchange;
 
         if(lazy > clever && lazy > hyperactive){
             return 'Lazy ('+Math.round((lazy/4)*100)+'%)';
@@ -131,13 +131,13 @@ Page {
         var dna = page.dna;
         var socialtrait = parseInt(dna.substr(0, 2), 2);
         if(socialtrait === 0){
-            return 'Helpful';
+            return 'Caring';
         }
         else if(socialtrait === 1){
             return 'Egoist';
         }
         else if(socialtrait === 2){
-            return 'Unknown';
+            return 'Communicative';
         }
         else if(socialtrait === 3){
             return 'Unknown';

@@ -652,19 +652,19 @@ Page {
             texts = ['The predator attacks '+name+'. '+heshe.capitalize()+' hasn\'t got a chance.', name+' is lying on the ground, lifeless. '+hisher.capitalize()+' '+color+' fur is stained with dark red blood.', 'The predator jumps on '+name+', digging its long sharp teeth deep into '+hisher+' fur. '+heshe.capitalize()+'\'s dead within a few seconds.'];
         }
         else if(event === 'ambient_day'){
-            texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple trough the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.', 'You see the treetops above you slowly dancing in the wind.'];
+            texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple through the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.', 'You see the treetops above you slowly dancing in the wind.'];
         }
         else if(event === 'ambient_night'){
-            texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the ponds surface, swirling trough the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.', 'The small pond seems to glow slightly in the pale moonlight.'];
+            texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the ponds surface, swirling through the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.', 'The small pond seems to glow slightly in the pale moonlight.'];
         }
         else if(event === 'guest_enter'){
             texts = [name+' visits the glade.', name+' visits the clearing. It\'s nice to see a few new faces around here.', name+' visits the clearing.'];
         }
         else if(event === 'guest_leave'){
-            texts = [name+' decides to go back home trough the dense forest.', name+' leaves the clearing and heads home.'];
+            texts = [name+' decides to go back home through the dense forest.', name+' leaves the clearing and heads home.'];
         }
         else if(event === 'sunrise'){
-            texts = ['The sun rises slowly above the treetops. A new day begins.', 'A fresh morning breeze blows trough the grass as the sun begins to rise.', 'Small dewdrops form in the tall grass as the sun rises above the trees.'];
+            texts = ['The sun rises slowly above the treetops. A new day begins.', 'A fresh morning breeze blows through the grass as the sun begins to rise.', 'Small dewdrops form in the tall grass as the sun rises above the trees.'];
         }
         else if(event === 'sundown'){
             texts = ['The descending sun paints the sky deep orange. The night is about to begin.', 'The sun is setting. It\'s getting darker around.', 'Slowly, the sun disappears behind a high fir. The night is coming.'];
@@ -727,7 +727,7 @@ Page {
         var storylines = new Array();
         storylines = ['Your head is aching. How long did you lie here before you woke up?', 'Sometimes, when you look at your reflection in the unruffled pond, you try to remember what was before the day you woke up here. You can\'t.', 'You feel alone. Alone in the endless woods. Maybe someone else is out there?', 'You barely sleep. Most nights, you just lie in the tall grass, gazing upon the starry sky above you.', 'How did you get here? Where did you come from? You look at the trees, silently waiting for answers.',
                       'When you lie awake at night, questions start filling your head. Where are you? Why are you here?', 'You realize that the moose are your family now. You see them growing up, getting old and die. It\'s sad.', 'Every time you see a new corpse lying on the ground, you fall apart a little more. You miss them.', 'A single black raven is flying above you, heading north. It\'s the first bird you see here.', 'Sometimes when you dream, you see small, blurred fragments of old memories. You see buildings. A city.',
-                      'The days start to blend into each other. How long has it been since you woke up on the glade?', 'Sometimes, mostly at night, you see shadows moving trough the dense forest around you.', 'You see more ravens, all heading north, flying across the sky like dark harbingers.', 'You didn\'t dream for a long time now. It feels like the last connection to your old life is fading.', 'Every morning you remember your first day on the clearing. Remember the three moose, their soft fur, their smell.',
+                      'The days start to blend into each other. How long has it been since you woke up on the glade?', 'Sometimes, mostly at night, you see shadows moving through the dense forest around you.', 'You see more ravens, all heading north, flying across the sky like dark harbingers.', 'You didn\'t dream for a long time now. It feels like the last connection to your old life is fading.', 'Every morning you remember your first day on the clearing. Remember the three moose, their soft fur, their smell.',
                       'The memory of your first day here is the only thing that you have. It makes everything feel real.', 'In some nights, you can feel something in the forest around the glade. The woods feel alive.', 'It happened. You forgot their names. The only memory you had. Destroyed, erased.', 'After the dreams stopped, the nightmares began. You see yourself, running, fleeing, yet not getting anywhere.', 'Every once in a while, you can feel a nameless evil standing right behind you. You spin around. Nothing.',
                       'The huge trees around you look more sinister than before. The entire forest appears to get darker and deeper every day.', 'You can\'t stand this feeling anymore. Always looking around you, just waiting for something to jump on you.', '<endgame>'];
 
@@ -1129,9 +1129,9 @@ Page {
         var directionchange = parseInt(dna.substr(13, 4), 2)/16;
         var searchingduration = parseInt(dna.substr(36, 4), 2)/16;
 
-        var lazy = stillchange*4 - movingchange;
-        var clever = viewarea*2 + searchingduration*2;
-        var hyperactive = (1 + movingchange)*(1 + directionchange) - stillchange;
+        var lazy = movingchange*4 - stillchange*1.2;
+        var clever = viewarea*1.8 + searchingduration*1.8;
+        var hyperactive = (stillchange*2)+(directionchange*2) - movingchange;
 
         if(lazy > clever && lazy > hyperactive){
             return 'Lazy';
@@ -1148,13 +1148,13 @@ Page {
     function pers3(dna){ // Social character trait
         var socialtrait = parseInt(dna.substr(0, 2), 2);
         if(socialtrait === 0){
-            return 'Helpful';
+            return 'Caring';
         }
         else if(socialtrait === 1){
             return 'Egoist';
         }
         else if(socialtrait === 2){
-            return 'Unknown';
+            return 'Communicative';
         }
         else if(socialtrait === 3){
             return 'Unknown';
@@ -1165,7 +1165,7 @@ Page {
 
     function enddialogue(){
         var storylines = new Array();
-        storylines = ['Despite any common sense, you run into the deep dark forest surrounding you. You have to get away. Just away.', 'You run trough the thick stems in a bizarre zigzag, trying to stay on your feet. Dead branches and leaves cover the forest floor.', 'You feel something behind you, quickly catching up as you stagger deeper and deeper into the woods.', 'You have to see it, just once, just for a second. You need certainty.', 'For a fraction of a second, you turn your head to see behind you. Nothing. A log on the ground. You stumble. You fall.', 'For a moment, you realize that your head is about to hit the ground, then the trees around you form a huge blur as everything fades away.', 'Everything is gone. You hear voices around you, whispering, eternal darkness surrounding you.', 'Slowly, you open your eyes. You look around. You\'re lying on a small glade in a deep forest.', 'You can see a few moose standing in the tall grass in front of you. They look friendly.']
+        storylines = ['Despite any common sense, you run into the deep dark forest surrounding you. You have to get away. Just away.', 'You run through the thick stems in a bizarre zigzag, trying to stay on your feet. Dead branches and leaves cover the forest floor.', 'You feel something behind you, quickly catching up as you stagger deeper and deeper into the woods.', 'You have to see it, just once, just for a second. You need certainty.', 'For a fraction of a second, you turn your head to see behind you. Nothing. A log on the ground. You stumble. You fall.', 'For a moment, you realize that your head is about to hit the ground, then the trees around you form a huge blur as everything fades away.', 'Everything is gone. You hear voices around you, whispering, eternal darkness surrounding you.', 'Slowly, you open your eyes. You look around. You\'re lying on a small glade in a deep forest.', 'You can see a few moose standing in the tall grass in front of you. They look friendly.']
         if(page.endindex < storylines.length){
 
             // Fade in new text

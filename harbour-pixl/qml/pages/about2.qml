@@ -10,6 +10,44 @@ Page {
         contentHeight: col.height + 20
         id: flick
 
+        // Easter Egg
+        Rectangle {
+            id: eegg
+            visible: thanks.clickcount > 7
+            anchors.centerIn: parent
+            width: page.width
+            height: eeggcol.height + theme.paddingMedium * 2
+            color: theme.highlightColor
+            z: 1000
+
+            Column{
+                id: eeggcol
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+
+                Image{
+                    source: 'qrc:///img/eegg4.png'
+                    smooth: false
+                    height: sourceSize.height * 4 * getscale()
+                    width: sourceSize.width * 4 * getscale()
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                Label{
+                    id: msgtext
+                    visible: parent.visible
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: 'Moo.'
+                    font.pointSize: theme.fontSizeLarge
+                    color: theme.invertedColor
+                }
+            }
+            MouseArea {
+                anchors.fill : parent
+                onClicked: thanks.clickcount = 0
+            }
+        }
+
         VerticalScrollDecorator{}
 
         Column {
@@ -138,6 +176,12 @@ Page {
                     right: parent.right
                     leftMargin: Theme.paddingMedium
                     rightMargin: Theme.paddingMedium
+                }
+                property int clickcount: 0
+
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: parent.clickcount = parent.clickcount + 1
                 }
             }
         }
