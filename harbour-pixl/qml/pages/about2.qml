@@ -4,49 +4,49 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
+    // Easter Egg
+    Rectangle {
+        id: eegg
+        visible: thanks.clickcount > 7
+        anchors.centerIn: parent
+        width: page.width
+        height: eeggcol.height + Theme.paddingMedium * 2
+        color: Theme.highlightColor
+        z: 1000
+
+        Column{
+            id: eeggcol
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+
+            Image{
+                source: '../img/eegg4.png'
+                smooth: false
+                height: sourceSize.height * 4
+                width: sourceSize.width * 4
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Label{
+                id: msgtext
+                visible: parent.visible
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: 'Moo.'
+                font.pointSize: Theme.fontSizeLarge
+                color: Theme.primaryColor
+            }
+        }
+        MouseArea {
+            anchors.fill : parent
+            onClicked: thanks.clickcount = 0
+        }
+    }
+
     SilicaFlickable {
         anchors.fill: parent
         height: parent.height
         contentHeight: col.height + 20
         id: flick
-
-        // Easter Egg
-        Rectangle {
-            id: eegg
-            visible: thanks.clickcount > 7
-            anchors.centerIn: parent
-            width: page.width
-            height: eeggcol.height + theme.paddingMedium * 2
-            color: theme.highlightColor
-            z: 1000
-
-            Column{
-                id: eeggcol
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-
-                Image{
-                    source: 'qrc:///img/eegg4.png'
-                    smooth: false
-                    height: sourceSize.height * 4 * getscale()
-                    width: sourceSize.width * 4 * getscale()
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                Label{
-                    id: msgtext
-                    visible: parent.visible
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: 'Moo.'
-                    font.pointSize: theme.fontSizeLarge
-                    color: theme.invertedColor
-                }
-            }
-            MouseArea {
-                anchors.fill : parent
-                onClicked: thanks.clickcount = 0
-            }
-        }
 
         VerticalScrollDecorator{}
 
@@ -167,7 +167,7 @@ Page {
             }
 
             Label {
-                id: body
+                id: thanks
                 text: 'Font by astramat.com<br>Database derived from \'noto\' by leszek.<br>Thanks to gukke, AL13N, KAOS and all the others who found bugs and shared their ideas.<br>Inspired by \'Disco Zoo\' and \'A dark room\'.<br> Thanks to all of you!'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
