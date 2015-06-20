@@ -7,6 +7,7 @@ import 'data.js' as DB
 
 Page {
     id: page
+    allowedOrientations: Orientation.All
     property var animals: new Array()
     property var predators: new Array()
     property var food: new Array()
@@ -756,6 +757,23 @@ Page {
         }
     }
 
+    // Triggers easteregg after specific swipe pattern
+    function swipe_eegg(swipe){
+        var directions = Array(4, 4, 1, 2, 3);
+        if(swipe === directions[swiper.swipeindex]){
+            swiper.swipeindex++;
+            swiper.start();
+        }
+        else{
+            swiper.swipeindex = 0;
+            swiper.stop();
+        }
+
+        if(swiper.swipeindex === 5){
+            pageStack.push(Qt.resolvedUrl('eegg.qml'));
+        }
+    }
+
 
     Timer {
         id: blinker
@@ -805,15 +823,78 @@ Page {
         onTriggered: spawnanimal(true)
     }
 
+    Timer{
+        id: swiper
+        interval: 10000
+        repeat: false
+        running: false
+        onTriggered: swipeindex = 0
+        property int swipeindex: 0
+    }
+
     Rectangle {
         id: rect
         width: parent.width
         height: parent.height
         color: '#84b331'
+
         MouseArea {
-        anchors.fill: parent
-        onClicked: touch(mouseX, mouseY)
+            // based on Swipe recognition by Gianluca from https://forum.qt.io/topic/39641/swipe-gesture-with-qt-quick-2-0-and-qt-5-2/4  - Thanks!
+            anchors.fill: parent
+            preventStealing: true
+            property real xvelocity: 0.0
+            property real yvelocity: 0.0
+            property int xStart: 0
+            property int xPrev: 0
+            property int yStart: 0
+            property int yPrev: 0
+            property bool tracing: false
+            onPressed: {
+                xStart = mouse.x
+                xPrev = mouse.x
+                yStart = mouse.y
+                yPrev = mouse.y
+                xvelocity = 0
+                yvelocity = 0
+                tracing = true
+            }
+
+            onPositionChanged: {
+                if (tracing){
+                    var xcurrVel = (mouse.x-xPrev);
+                    var ycurrVel = (mouse.y-yPrev);
+
+                    xvelocity = (xvelocity + xcurrVel)/2.0;
+                    yvelocity = (yvelocity + ycurrVel)/2.0;
+
+                    xPrev = mouse.x;
+                    yPrev = mouse.y;
+
+                    if ( xvelocity > 15 && Math.abs(xStart - mouse.x) > parent.width * 0.2) {
+                        tracing = false
+                        swipe_eegg(1);
+                    }
+                    else if(xvelocity < -15 && Math.abs(xStart - mouse.x) > parent.width * 0.2){
+                        tracing = false
+                        swipe_eegg(2);
+                    }
+                    else if(yvelocity < -15 && Math.abs(yStart - mouse.y) > parent.width * 0.2){
+                        tracing = false
+                        swipe_eegg(3);
+                    }
+                    else if(yvelocity > 15 && Math.abs(yStart - mouse.y) > parent.width * 0.2){
+                        tracing = false
+                        swipe_eegg(4);
+                    }
+                }
+            }
+
+            onReleased: {
+                tracing = false
+            }
+            onClicked: touch(mouseX, mouseY)
         }
+
         Behavior on color {
             ColorAnimation {duration: 700 }
         }

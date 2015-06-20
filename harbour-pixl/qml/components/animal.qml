@@ -49,7 +49,7 @@ Image {
     property real maxspeed: 4 // Max Walking speed
     property real minspeed: 1 // Min Walking Speed
     property int searchingduration: 500 // Max. duration of searching state
-    property int socialtrait: 0 // Character trait for social interaction 0: helpful 1: egoist  2: todo 3: todo
+    property int socialtrait: 0 // Character trait for social interaction 0: caring 1: egoist  2: communicative 3: todo
     property int socialval: 0 // Additional value for social actions, usage depends on socialtrait
 
     //Not in DNA
@@ -313,11 +313,34 @@ Image {
                     dist = Math.sqrt(dx*dx + dy*dy)
                     if(dist < viewarea){
                         xytodirection(2*dx, 2*dy); // Run in opposite direction
+
+                        // Warn surrounding animals if communicative
+                        if(socialtrait === 2){
+
+                            // Check for moose within viewarea
+                            var px = page.predators[i].x;
+                            var py = page.predators[i].y;
+
+                            for (var i = 0; i < page.animals.length; i++){
+                                dist = -1;
+
+                                if(page.animals[i].alive && page.animals[i].id !== id){ // Exclude dead animals and own animal
+                                    dx = x - (page.animals[i].x + 50)
+                                    dy = y - page.animals[i].y
+                                    dist = Math.sqrt(dx*dx + dy*dy)
+                                    if(dist < socialval * 200 && dist > 0){
+                                        // Trigger warning function
+                                        page.animals[i].warn(px, py);
+                                    }
+                                }
+
+                            }
+
+                        }
                     }
                 }
             }
         }
-
 
         // Log message if starving
         if(Math.round((animal.energy / animal.maxenergy)*100) < 25 && starvelog && animal.energy > 0){
@@ -392,6 +415,16 @@ Image {
     }
 
     // End tick function
+
+
+    // Warn function called by communicative animals
+    function warn(px, py){
+        if(socialtrait !== 1){ // Egoist moose don't get warnings
+            var dx = x - (px + 50);
+            var dy = y - py;
+            xytodirection(2*dx, 2*dy); // Run in opposite direction
+        }
+    }
 
     function chance(probability){
         if(Math.floor(Math.random()*probability) === 0){

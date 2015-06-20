@@ -38,7 +38,8 @@ OTHER_FILES += qml/harbour-pixl.qml \
     qml/components/dialog_firstupload.qml \
     qml/pages/invite.qml \
     qml/pages/logview.qml \
-    qml/components/predator.qml
+    qml/components/predator.qml \
+    qml/pages/eegg.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line

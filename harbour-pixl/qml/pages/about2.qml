@@ -184,6 +184,12 @@ Page {
                     onClicked: parent.clickcount = parent.clickcount + 1
                 }
             }
+
+            Label {
+               text: 'down down right left up'
+               font.pixelSize: Theme.fontSizeExtraSmall
+               anchors.horizontalCenter: parent.horizontalCenter
+            }
         }
     }
 
