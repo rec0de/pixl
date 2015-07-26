@@ -39,7 +39,9 @@ OTHER_FILES += qml/harbour-pixl.qml \
     qml/pages/invite.qml \
     qml/pages/logview.qml \
     qml/components/predator.qml \
-    qml/pages/eegg.qml
+    qml/pages/eegg.qml \
+    qml/components/tree.qml \
+    qml/pages/treeedit.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line
