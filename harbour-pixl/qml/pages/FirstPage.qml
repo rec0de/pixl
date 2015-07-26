@@ -12,6 +12,7 @@ Page {
     property var predators: new Array()
     property var food: new Array()
     property var hearts: new Array()
+    property var trees: new Array()
     property bool debug: false // Display debug tools and disable automatic animal spawning
     property bool slowdown: true // Enables/Disables age based animal slowdown
     property bool spawnpred: true // Enables/Disables predator spawning
@@ -83,11 +84,17 @@ Page {
             DB.setsett(5, 5);
         }
 
+        // Save first tree to DB
+        if(DB.getsett(5) < 6){
+            DB.setsett(5, 6);
+            DB.tree_add(300, 700);
+        }
+
         // Load local animals from DB
         var data = DB.getall();
         var animal_comp = Qt.createComponent("../components/animal.qml");
 
-        if(data != false){
+        if(data !== false){
             for(var i = 0; i < data.length; i++){
                 var temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: data[i].name, age: data[i].age, id: data[i].id});
                 temp.importfromdna(data[i].dna);
@@ -99,7 +106,7 @@ Page {
         // Load guest animals from DB
         data = DB.getnonlocal();
 
-        if(data != false){
+        if(data !== false){
             for(i = 0; i < data.length; i++){
                 temp = animal_comp.createObject(page, {x: Math.floor(Math.random()*page.width), absy: Math.floor(Math.random()*page.height), name: data[i].name, age: data[i].age, id: data[i].id,local: false});
                 temp.importfromdna(data[i].dna);
@@ -246,6 +253,23 @@ Page {
             }
         }
 
+        // Delete all trees
+        for(i = 0; i < trees.length; i++){
+            trees[i].destroy();
+        }
+        trees = new Array();
+
+        // Load trees from DB
+        var data = DB.tree_get();
+        var tree_comp = Qt.createComponent("../components/tree.qml");
+
+        if(data !== false){
+            for(i = 0; i < data.length; i++){
+                temp = tree_comp.createObject(page, {x: data[i].x, y: data[i].y});
+                page.trees.push(temp);
+            }
+        }
+
 
     }
 
@@ -350,7 +374,6 @@ Page {
     function tickall(){
         // Pause if minimized
         if(!Qt.application.active){
-            //console.log ("Application minimized, pausing.");
             pause();
         }
 
@@ -770,6 +793,7 @@ Page {
         }
 
         if(swiper.swipeindex === 5){
+            pause();
             pageStack.push(Qt.resolvedUrl('eegg.qml'));
         }
     }
@@ -908,28 +932,6 @@ Page {
         height: rect.height
         fillMode: Image.Tile
     }
-
-    Image {
-        source: "../img/tree.png"
-        id: tree
-        opacity: 1
-        width: 80
-        height: 110
-        x: 300
-        y: 700
-        z: 1000
-    }
-    Image {
-        source: "../img/tree_shadow.png"
-        id: treeshadow
-        opacity: 1
-        width: 80
-        height: 20
-        x: 300
-        y: 790
-        z: 0
-    }
-
 
     Image {
         source: "../img/pond_day.png"
@@ -1162,7 +1164,7 @@ Page {
                 font.family: pixels.name
             }
             Label {
-                visible: false // Work in progress
+                visible: true // Work in progress
                 id: characterc
                 text: 'Unknown'
                 font.pixelSize: 24

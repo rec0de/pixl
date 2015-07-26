@@ -87,11 +87,11 @@ Page {
             }
 
             SectionHeader {
-                text: "Social traits"
+                text: "Social behaviour"
             }
 
             Label {
-                text:   '[TODO]'
+                text:   'Every animal has one out of four social character traits. Every character trait comes with a special ability/behavoiur. Caring animals can feed other moose and can store more energy. Communicative moose warn others of danger and can send moose to starving young moose. Egoist moose can steel food from others and won\'t feed young animals. They also won\'t be fed by caring animals and aren\'t warned by communicative moose.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {

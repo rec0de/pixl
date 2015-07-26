@@ -76,6 +76,7 @@ Image {
     property int grownupage: 20 // Animal will be considered grown-up from this age on (age in user unit, internal units are 400 times larger)
     property int matecooldown: 60*5*1000 // 5 minutes 'cooldown'
     property int attention: 10 // How often animal looks for predators, lower is better
+    property string status: 'blank' // Status image
 
     // Database related
     property string name: 'Mr. Moose'
@@ -94,6 +95,18 @@ Image {
         y: parent.height - 5 + parent.sshift
         z: 0
     }
+
+    Image {
+        id: statusimg
+        source: "../img/status_"+parent.status+".png"
+        smooth: false
+        width: 20
+        height: 20
+        x: -20
+        y: parent.sshift
+        z: 0
+    }
+
 
     Text{
         id: nametext
@@ -253,40 +266,57 @@ Image {
                                 var partnerenergy = page.animals[i].energy / page.animals[i].maxenergy;
 
                                 // Feed young (hungry) moose if not egoist and not hungry
-                                if(socialtrait !== 1 && age > 20*400 && page.animals[i].age < 18*400 && partnerenergy < (ownenergy*1.3)){
-                                    var giveenergy = 0.3 * ownenergy * ownenergy * energy
+                                if(socialtrait !== 1 && age > 20*400 && page.animals[i].age < 20*400 && partnerenergy < (ownenergy*1.5)){
+                                    var giveenergy = 0.25 * ownenergy * energy
                                     page.animals[i].energy = page.animals[i].energy + giveenergy;
 
                                     if(page.animals[i].energy > page.animals[i].maxenergy){
+                                        energy  += page.animals[i].energy - page.animals[i].maxenergy; // Give additional energy back
                                         page.animals[i].energy = page.animals[i].maxenergy; // Avoid higher than 100% energy
                                     }
 
                                     energy = energy - giveenergy;
                                     console.log('Fed '+giveenergy+' to '+animals[i].name);
+
+                                    if(status !== 'give'){
+                                        status = 'give'; // Display feeding icon
+                                        statusreset.start();
+                                    }
                                 }
                                 // Feed if partner is hungry and animal is helpful with 1/2 chance
-                                else if(false && socialtrait === 0 && chance(2) && partnerenergy < ownenergy){ // Deactivated for now, WIP
-                                    giveenergy = 0.23 * ownenergy * ownenergy * energy
+                                else if(socialtrait === 0 && chance(2) && partnerenergy < ownenergy){
+                                    giveenergy = 0.2 * ownenergy * energy
                                     page.animals[i].energy = page.animals[i].energy + giveenergy;
 
                                     if(page.animals[i].energy > page.animals[i].maxenergy){
+                                        energy  += page.animals[i].energy - page.animals[i].maxenergy; // Give additional energy back
                                         page.animals[i].energy = page.animals[i].maxenergy; // Avoid higher than 100% energy
                                     }
 
                                     energy = energy - giveenergy;
                                     console.log('Fed '+giveenergy+' to moose.');
+
+                                    if(status !== 'give'){
+                                        status = 'give'; // Display feeding icon
+                                        statusreset.start();
+                                    }
                                 }
                                 // Steal food if egoist with 1/5 chance
-                                else if(false && socialtrait === 1 && chance(5) && partnerenergy > ownenergy){ // Deactivated for now, WIP
+                                else if(socialtrait === 1 && chance(5) && partnerenergy > ownenergy){
                                     var takeenergy = 0.1 * partnerenergy * partnerenergy * page.animals[i].energy;
-                                    page.animals[i].energy = page.animals[i].energy - giveenergy;
-                                    energy = energy + giveenergy;
+                                    page.animals[i].energy = page.animals[i].energy - takeenergy;
+                                    energy = energy + takeenergy;
 
                                     if(energy > maxenergy){
                                         energy = maxenergy; // Avoid higher than 100% energy
                                     }
 
-                                    console.log('Stole '+giveenergy+' from moose.');
+                                    console.log('Stole '+takeenergy+' from moose.');
+
+                                    if(status !== 'steal'){
+                                        status = 'steal'; // Display stealing icon
+                                        statusreset.start();
+                                    }
                                 }
                             }
                         }
@@ -303,7 +333,7 @@ Image {
         }
 
         // Look for predators
-        if(page.predators.length > 0 && chance(animal.attention)){
+        if(page.predators.length > 0 && (searching || chance(animal.attention))){
             // Check for other moose within viewarea
             for (i = 0; i < page.predators.length; i++){
                 dist = -1;
@@ -313,6 +343,16 @@ Image {
                     dist = Math.sqrt(dx*dx + dy*dy)
                     if(dist < viewarea){
                         xytodirection(2*dx, 2*dy); // Run in opposite direction
+
+                        if(!searching){
+                            searching = true; // Temporally increase attention
+                            searcher.start();
+                        }
+
+                        if(status !== 'alert'){
+                            status = 'alert'; // Display alert icon
+                            statusreset.start();
+                        }
 
                         // Warn surrounding animals if communicative
                         if(socialtrait === 2){
@@ -328,9 +368,10 @@ Image {
                                     dx = x - (page.animals[i].x + 50)
                                     dy = y - page.animals[i].y
                                     dist = Math.sqrt(dx*dx + dy*dy)
-                                    if(dist < socialval * 200 && dist > 0){
+                                    if(dist < socialval * 40 && dist > 0){
                                         // Trigger warning function
                                         page.animals[i].warn(px, py);
+                                        console.log('Warned animal');
                                     }
                                 }
 
@@ -423,6 +464,16 @@ Image {
             var dx = x - (px + 50);
             var dy = y - py;
             xytodirection(2*dx, 2*dy); // Run in opposite direction
+
+            if(status !== 'alert'){
+                status = 'alert'; // Display alert icon
+                statusreset.start();
+            }
+
+            if(!searching){ // Increase attention
+                searching = true;
+                searcher.start();
+            }
         }
     }
 
@@ -483,6 +534,11 @@ Image {
             searchingduration = 300 + parseInt(dna.substr(36, 4), 2)*100;
             socialtrait = parseInt(dna.substr(0, 2), 2);
             socialval = parseInt(dna.substr(40, 3), 2);
+
+            if(socialval === 0){
+                // Bonus energy for caring animals
+                maxenergy += socialval / 3;
+            }
         }
         else{
             console.log('DNA import failed. '+dna+' '+dna.length);
@@ -633,6 +689,14 @@ Image {
         running: false
         repeat: false
         onTriggered: parent.searching = false;
+    }
+
+    Timer {
+        id: statusreset
+        interval: 2500
+        running: false
+        repeat: false
+        onTriggered: parent.status = 'blank';
     }
 
     Timer {

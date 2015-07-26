@@ -331,7 +331,7 @@ Page {
             }
 
             Label {
-                visible: false // Work in progress
+                visible: true // Work in progress
                 text: pers3()
                 anchors.horizontalCenter: parent.horizontalCenter
             }

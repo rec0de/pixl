@@ -39,6 +39,7 @@ function initialize() {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS log (id INTEGER UNIQUE, val TEXT, info TEXT, mooseid INTEGER,time INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS namegender (id INTEGER UNIQUE, val INTEGER)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS matetime (id INTEGER UNIQUE, val INTEGER)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS trees (x INTEGER, y INTEGER)');
                 });
 }
 
@@ -476,6 +477,56 @@ function log_clear(){
     return res
 }
 
+
+// Add a tree to DB
+function tree_add(x, y){
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('INSERT INTO trees VALUES (?,?);', [x, y]);
+        if (rs.rowsAffected > 0) {
+            res = "OK";
+        } else {
+            res = "Error";
+        }
+    }
+    );
+    return res;
+}
+
+// Get all trees from DB
+function tree_get() {
+    var db = getDatabase();
+    var res;
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('SELECT x, y FROM trees');
+        if (rs.rows.length > 0) {
+            res = rs.rows;
+        } else {
+            res = false;
+        }
+    })
+    return res
+}
+
+// Delete all trees
+function tree_clear(){
+    var db = getDatabase();
+    var res = "";
+    db.transaction(function(tx) {
+        var rs = tx.executeSql('DELETE FROM trees');
+        if (rs.rowsAffected > 0) {
+            res = "OK";
+        } else {
+            res = "Error";
+        }
+    }
+    );
+    return res;
+}
+
+
+
 // This function resets the game
 function clearnonlocal(){
     var db = getDatabase();
@@ -494,6 +545,9 @@ function hardreset(){
         tx.executeSql('DROP TABLE nonlocal;');
         tx.executeSql('DROP TABLE namegender;');
         tx.executeSql('DROP TABLE log;');
+        tx.executeSql('DROP TABLE matetime;');
+        tx.executeSql('DROP TABLE ancestors;');
+        tx.executeSql('DROP TABLE trees;');
     })
 }
 

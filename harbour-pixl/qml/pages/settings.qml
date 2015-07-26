@@ -211,6 +211,15 @@ Page {
                 }
             }
 
+            Button {
+               text: "Edit trees"
+               visible: true
+               anchors.horizontalCenter: parent.horizontalCenter
+               onClicked:{
+                    pageStack.push(Qt.resolvedUrl("treeedit.qml"));
+               }
+            }
+
             SectionHeader {
                 text: "Debug"
             }
