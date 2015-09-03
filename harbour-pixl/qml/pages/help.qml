@@ -91,7 +91,7 @@ Page {
             }
 
             Label {
-                text:   'Every animal has one out of four social character traits. Every character trait comes with a special ability/behaviour. Caring animals can feed other moose and can store more energy, communicative moose warn others of danger, egoist moose can steel food from others and won\'t feed young animals. They also won\'t be fed by caring animals and aren\'t warned by communicative moose.'
+                text:   'Every animal has one out of four social character traits. Every character trait comes with a special ability/behaviour. Caring animals can feed other moose and can store more energy, communicative moose warn others of danger, solitary moose are less likely to stay near others and egoist moose can steal food from others and won\'t feed young animals. They also won\'t be fed by caring animals and aren\'t warned by communicative moose.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {
@@ -125,6 +125,22 @@ Page {
 
             Label {
                 text:   'When two grown up (age > 20) animals stand next to each other, there is a chance that they will mate and create a new animal. This chance depends on both animals energy (higher is better) and age (lower is better, only if high age slowdown is enabled). The new animals DNA is a combination of the parents DNA. After an animal has mated, it can\'t mate again for ~5 minutes.'
+                font.pixelSize: Theme.fontSizeSmall
+                wrapMode: Text.WordWrap
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+            }
+
+            SectionHeader {
+                text: "Status icons"
+            }
+
+            Label {
+                text:   'Status icons are small icons displayed next to your moose that give some information about an animals current behaviour. A green plus indicates that the animal has just fed another moose, a red minus shows that it has stolen food. A red exclamation mark appears when a moose spots a predator and attempts to run away from it and an orange exclamation mark appears when a moose has been warned about, but has not spotted a predator. You can disable status icons in the settings menu.'
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
                 anchors {

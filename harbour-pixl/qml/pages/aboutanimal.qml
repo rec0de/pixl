@@ -140,7 +140,7 @@ Page {
             return 'Communicative';
         }
         else if(socialtrait === 3){
-            return 'Unknown';
+            return 'Solitary';
         }
     }
 

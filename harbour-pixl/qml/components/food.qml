@@ -1,6 +1,7 @@
 import QtQuick 2.0
 
 Item {
+    id: food
     width: 20
     height: 25
     x: 50
@@ -8,8 +9,6 @@ Item {
     z: 0
     property bool active: true
     property bool manual: false // True if food was spawned manually by user
-
-    // Couldnt figure out how to do static textures...
 
     Image {
       source: (manual ? "../img/bigfood.png" : "../img/food.png")
@@ -30,7 +29,7 @@ Item {
     }
 
     function despawn(){
-        active = false;
-        destroy();
+        food.active = false;
+        food.destroy();
     }
 }

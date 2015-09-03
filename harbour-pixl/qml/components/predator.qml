@@ -53,16 +53,6 @@ Image {
         z: 0
     }
 
-    Text{
-        id: pred_energy
-        visible: page.debug
-        x: 50
-        text: parent.energy
-        color: '#ffffff'
-        font.pixelSize: 16
-        font.family: pixels.name
-    }
-
     function tick(){
 
         y = absy - yshift;

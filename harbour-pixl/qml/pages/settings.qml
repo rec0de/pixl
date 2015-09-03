@@ -36,6 +36,10 @@ Page {
             logorder.checked = true;
         }
 
+        if(DB.getsett(16) != 0){
+            statusicons.checked = true;
+        }
+
         if(DB.getsett(3) != -1){
             foodrate.value = DB.getsett(3);
         }
@@ -112,6 +116,18 @@ Page {
         }
     }
 
+    function switchstatus(){
+        var val = DB.getsett(16);
+        if(val != 0){
+            DB.setsett(16, 0); // Do not display status icons
+            statusicons.checked = false;
+        }
+        else{
+            DB.setsett(16, 1); // Display status icons
+            statusicons.checked = true;
+        }
+    }
+
 
     // Save new foodrate to DB
     function updatefoodrate(){
@@ -182,6 +198,17 @@ Page {
                 checked: false
                 onClicked: {
                     switchlogorder()
+                }
+            }
+
+            TextSwitch {
+                id: statusicons
+                text: "Status icons"
+                description: "Displays small icons next to moose"
+                automaticCheck: false
+                checked: false
+                onClicked: {
+                    switchstatus()
                 }
             }
 

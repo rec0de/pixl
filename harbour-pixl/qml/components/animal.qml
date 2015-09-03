@@ -98,6 +98,7 @@ Image {
 
     Image {
         id: statusimg
+        visible: page.showstatus
         source: "../img/status_"+parent.status+".png"
         smooth: false
         width: 20
@@ -283,7 +284,7 @@ Image {
                                         statusreset.start();
                                     }
                                 }
-                                // Feed if partner is hungry and animal is helpful with 1/2 chance
+                                // Feed if partner is hungry and animal is caring with 1/2 chance
                                 else if(socialtrait === 0 && chance(2) && partnerenergy < ownenergy){
                                     giveenergy = 0.2 * ownenergy * energy
                                     page.animals[i].energy = page.animals[i].energy + giveenergy;
@@ -321,7 +322,15 @@ Image {
                             }
                         }
                         else{
-                          if(chance(10) || (age < 400 * grownupage && chance(Math.pow(2, Math.round(age/2000)) + 1))){ // Young moose tend to stay near others, formula: chance = 2^(0.2 * (age/400)) + 1
+                          var prob = 10;
+                          if(socialtrait === 3){ // Solitary moose are less likely to stay near others
+                              prob = 25;
+                          }
+
+                          if(chance(prob) || (age < 400 * grownupage && chance(Math.pow(2, Math.round(age/2000)) + 1))){ // Young moose tend to stay near others, formula: chance = 2^(0.2 * (age/400)) + 1
+                            xytodirection(page.animals[i].x + 50, page.animals[i].y);
+                          }
+                          else if(socialtrait === 0 && page.animals[i].age < 400 * grownupage && chance(2)){ // Caring moose stay near young moose
                             xytodirection(page.animals[i].x + 50, page.animals[i].y);
                           }
                         }
@@ -333,7 +342,7 @@ Image {
         }
 
         // Look for predators
-        if(page.predators.length > 0 && (searching || chance(animal.attention))){
+        if(page.predators.length > 0 && ((searching && chance(Math.floor(animal.attention / 2))) || chance(animal.attention))){
             // Check for other moose within viewarea
             for (i = 0; i < page.predators.length; i++){
                 dist = -1;
@@ -535,9 +544,13 @@ Image {
             socialtrait = parseInt(dna.substr(0, 2), 2);
             socialval = parseInt(dna.substr(40, 3), 2);
 
-            if(socialval === 0){
+            if(socialtrait === 0){
                 // Bonus energy for caring animals
                 maxenergy += socialval / 3;
+            }
+            else if(socialtrait === 3){
+                // Solitary animals have larger viewarea
+                viewarea += socialval * 6;
             }
         }
         else{
