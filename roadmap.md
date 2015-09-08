@@ -13,7 +13,7 @@ Better stats / character traits (done)
 
 Option to reverse log order (done)
 
-Social interaction (in progress)
+Social interaction (done)
 
 ## User-requested features
 
@@ -63,9 +63,9 @@ Add predators (done)
 
 Add info text on event log (done)
 
-More social interaction (in progress)
+More social interaction (done)
 
-Add other death causes (planned)
+Add other death causes (maybe)
 
 Improve animal movement
 
