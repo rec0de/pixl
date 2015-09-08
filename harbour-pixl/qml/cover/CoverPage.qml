@@ -20,6 +20,7 @@ CoverBackground {
         }
         else
         {
+            sleep.start();
             ticker.running = true;
             playpause.iconSource = "image://theme/icon-cover-pause";
         }
@@ -129,6 +130,17 @@ CoverBackground {
         onTriggered: tick()
     }
 
+    // Suspend animation after 50s to comply with harbour power/idle guidelines
+    Timer {
+        id: sleep
+        interval: 50000
+        running: false
+        repeat: false
+        onTriggered:{
+            playpause.iconSource = "image://theme/icon-cover-play";
+            ticker.running = false
+        }
+    }
 
     Rectangle {
         id: rect
