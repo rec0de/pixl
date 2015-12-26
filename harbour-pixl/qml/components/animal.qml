@@ -170,7 +170,7 @@ Image {
                     var dx = x - page.food[i].x
                     var dy = y - page.food[i].y
                     dist = Math.sqrt(dx*dx + dy*dy)
-                    if(dist < viewarea){
+                    if(dist < viewarea && page.food[i].x < (page.width - 30) && page.food[i].y < (page.height - 30)){
                         xytodirection(page.food[i].x, page.food[i].y);
                         break;
                     }
