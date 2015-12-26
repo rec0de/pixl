@@ -40,6 +40,10 @@ Page {
             statusicons.checked = true;
         }
 
+        if(DB.getsett(17) == 1){
+            pauseonmsg.checked = true;
+        }
+
         if(DB.getsett(3) != -1){
             foodrate.value = DB.getsett(3);
         }
@@ -128,6 +132,19 @@ Page {
         }
     }
 
+    function switchpausemsg(){
+        var val = DB.getsett(17);
+        if(val != 1){
+            DB.setsett(17, 1); // Activate pause on msg
+            pauseonmsg.checked = true;
+        }
+        else{
+            DB.setsett(17, 0); // Deactivate pause on msg
+            pauseonmsg.checked = false;
+        }
+    }
+
+
 
     // Save new foodrate to DB
     function updatefoodrate(){
@@ -187,6 +204,17 @@ Page {
                 checked: false
                 onClicked: {
                     switchmsg()
+                }
+            }
+
+            TextSwitch {
+                id: pauseonmsg
+                text: "Pause on message"
+                description: "Pauses game on new log message"
+                automaticCheck: false
+                checked: false
+                onClicked: {
+                    switchpausemsg()
                 }
             }
 

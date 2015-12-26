@@ -21,6 +21,7 @@
 // 14  Left empty for consistency with cross platform version
 // 15  1 if last log message was ambient message
 // 16  Show status icons (Default on)
+// 17  Pause in new message (Default off)
 
 // First, let's create a short helper function to get the database connection
 function getDatabase() {

@@ -25,6 +25,7 @@ Page {
     property bool paused: true // Game is paused
     property int playtime: 0 // Time played in seconds
     property int endindex: 0 // Index for end story
+    property bool pauseonmsg: false // Pause game on new log message
 
     Component.onCompleted: {
         DB.initialize();
@@ -119,7 +120,6 @@ Page {
         // Christmas mode (Only in december)
         var today = new Date();
         if(today.getMonth() == 11){ // Uses zero based indexing for months
-          tree.source = '../img/tree_xmas.png'; // Display christmas tree
 
             // Display moose hats for dark and common moose
             for(i = 0; i < page.animals.length; i++){
@@ -212,6 +212,14 @@ Page {
         }
         else{
             page.showstatus = false;
+        }
+
+        // Update pause on message
+        if(DB.getsett(17) == 1){
+            page.pauseonmsg = true;
+        }
+        else{
+            page.pauseonmsg = false;
         }
 
         // Update food rate
@@ -344,6 +352,10 @@ Page {
                     color = parseInt(page.animals[i].dna.substr(2, 2), 2) + 1;
                     page.animals[i].source = '../img/eegg' + color + '.png';
                 }
+                else if(page.animals[i].name === 'Julian'){
+                    color = parseInt(page.animals[i].dna.substr(2, 2), 2) + 1;
+                    page.animals[i].source = '../img/ju' + color + '.png';
+                }
                 else{
                     color = parseInt(page.animals[i].dna.substr(2, 2), 2) + 1;
                     page.animals[i].source = '../img/moose' + color + '.png';
@@ -366,7 +378,7 @@ Page {
         }
         else{
           // Spawn food at touch location
-          if(x < (page.width - 30)){ // Avoid uneatable food
+          if(x < (page.width - 30) && y < (page.height - 30)){ // Avoid uneatable food
               var food_comp = Qt.createComponent("../components/food.qml");
               var temp = food_comp.createObject(page, {x: x, y: y, manual: true});
               page.food.push(temp);
@@ -785,6 +797,9 @@ Page {
         if(page.showmsgs){
             msgtext.text = text;
             logmsg.visible = true;
+            if(page.pauseonmsg){
+                pause();
+            }
         }
     }
 

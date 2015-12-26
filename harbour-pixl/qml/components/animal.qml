@@ -26,7 +26,7 @@ import '../pages/data.js' as DB
 
 
 Image {
-    source: "../img/moose.png"
+    source: "../img/moose1.png"
     mirror: false
     id: animal
     opacity: 1
@@ -559,8 +559,6 @@ Image {
     }
 
     function showname(){
-        // Toggle nametag
-        nametext.visible = !nametext.visible;
         if(page.paused){
             // Display animal info
             animalstats.a_name = animal.name;
@@ -570,6 +568,10 @@ Image {
             animalstats.a_id = animal.id;
             animalstats.a_energy = Math.round((animal.energy / animal.maxenergy)*100) + '%';
             animalstats.visible = true;
+        }
+        else{
+            // Toggle nametag
+            nametext.visible = !nametext.visible;
         }
     }
 
