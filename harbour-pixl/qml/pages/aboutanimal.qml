@@ -150,7 +150,7 @@ Page {
     }
 
     function upload() {
-        var url = 'https://cdown.pf-control.de/pixl/upload.php?dna='+page.dna+'&name='+page.name+'&age='+(page.age*400); // alias domain for rec0de.net with valid SSL cert
+        var url = 'https://rec0de.net/pixl/upload.php?dna='+page.dna+'&name='+page.name+'&age='+(page.age*400); // alias domain for rec0de.net with valid SSL cert
 
         var xhr = new XMLHttpRequest();
         xhr.timeout = 1000;
