@@ -109,23 +109,13 @@ Page {
             }
 
             Label {
-                text: "mail@rec0de.net <br> GnuPG available"
+                text: "mail@rec0de.net"
                 anchors.horizontalCenter: parent.horizontalCenter
                 MouseArea {
                     id : contactMouseArea
                     anchors.fill : parent
                     onClicked: Qt.openUrlExternally("mailto:mail@rec0de.net")
                 }
-            }
-
-            SectionHeader {
-                text: "Support me?"
-            }
-
-            Button {
-                text: "Tip me (BTC/DOGE)"
-               onClicked: Qt.openUrlExternally("http://rec0de.net/a/tip.php")
-               anchors.horizontalCenter: parent.horizontalCenter
             }
 
             SectionHeader {

@@ -15,6 +15,12 @@ TARGET = harbour-pixl
 CONFIG += sailfishapp
 QT += dbus
 
+appicons.path = /usr/share/icons/hicolor
+
+appicons.files = appicons/*
+
+INSTALLS += appicons
+
 SOURCES += src/harbour-pixl.cpp
 
 OTHER_FILES += qml/harbour-pixl.qml \
