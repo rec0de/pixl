@@ -51,12 +51,13 @@ Dialog {
         }
 
         ComboBox {
-            label: "This name is"
+            label: "Use these pronouns"
             id: namegender
 
             menu: ContextMenu {
-                MenuItem { text: "Male" }
-                MenuItem { text: "Female" }
+                MenuItem { text: "he/him" }
+                MenuItem { text: "she/her" }
+                MenuItem { text: "they/them" }
             }
         }
 

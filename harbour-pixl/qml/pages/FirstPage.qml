@@ -588,13 +588,11 @@ Page {
 
     // returns random name
     function ranname(){
-        var names = new Array();
-        var nameg = new Array(); // Name gender lookup
         // Moose in different languages
-        names = ['Elg', 'Eland', 'Poder', 'Hirvi', 'Elan', 'Elch', 'Elgur', 'Munsu', 'Eilc', 'Alce', 'Alces', 'Briedis', 'Atawhenua', 'Losi', 'Uncal', 'Älg', 'Elciaid'];
-        nameg = [    0,       1,       0,       1,      1,      0,       0,       0,      1,      1,       1,         0,           1,      1,       0,     0,         1];
+        var names = ['Elg', 'Eland', 'Poder', 'Hirvi', 'Elan', 'Elch', 'Elgur', 'Munsu', 'Eilc', 'Alce', 'Alces', 'Briedis', 'Atawhenua', 'Losi', 'Uncal', 'Älg', 'Elciaid'];
+        var nameg = [    2,       1,       0,       1,      1,      0,       2,       0,      1,      1,       1,         2,           1,      1,       0,     0,         2]; // Name gender lookup
         var index = Math.floor(Math.random()*names.length);
-        return new Array(names[index], nameg[index]);
+        return [names[index], nameg[index]];
     }
 
 
@@ -650,16 +648,34 @@ Page {
 
     // Contains log texts for various events
     function log(event, name, dna, id, local){
-        var texts = new Array();
-        var colorlist = new Array('brown', 'dark', 'red', 'beige');
+        var texts = [];
+        var colorlist = ['brown', 'dark', 'red', 'beige'];
 
-        if(id !== false){
-            var namegender = DB.getnamegender(id);
+        var namegender = 2; // Default to they/them
+
+        if(id && local){
+            namegender = DB.getnamegender(id);
         }
 
-        var hisher = (namegender == 1 ? "her" : "his");
-        var himher = (namegender == 1 ? "her" : "him");
-        var heshe = (namegender == 1 ? "she" : "he");
+        var hisher;
+        var himher;
+        var heshe;
+        switch(namegender) {
+            case 0:
+                hisher = "his";
+                himher = "him";
+                heshe = "he";
+                break;
+            case 1:
+                hisher = "her";
+                himher = "her";
+                heshe = "she";
+                break;
+            default:
+                hisher = "their";
+                himher = "them";
+                heshe = "they";
+        }
 
         // Capitalizes first letter
         String.prototype.capitalize = function() {
@@ -696,10 +712,10 @@ Page {
             texts = ['The predator attacks '+name+'. '+heshe.capitalize()+' hasn\'t got a chance.', name+' is lying on the ground, lifeless. '+hisher.capitalize()+' '+color+' fur is stained with dark red blood.', 'The predator jumps on '+name+', digging its long sharp teeth deep into '+hisher+' fur. '+heshe.capitalize()+'\'s dead within a few seconds.'];
         }
         else if(event === 'ambient_day'){
-            texts = ['The clearing lies calm in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple through the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.', 'You see the treetops above you slowly dancing in the wind.'];
+            texts = ['The clearing lies calmly in the light breeze. The tall grass is waving slowly.', 'You can see small clouds slowly drifting away above you.', 'You can see the reflection of the big firs in the calm pond.', 'A single flower stands in the tall grass, nodding slowly in the wind.', 'Small waves ripple through the tall grass as the wind blows softly.', 'A faint swish emerges from the forest in the light breeze.', 'You see the treetops above you slowly dancing in the wind.'];
         }
         else if(event === 'ambient_night'){
-            texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the ponds surface, swirling through the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.', 'The small pond seems to glow slightly in the pale moonlight.'];
+            texts = ['The pale moon shines on the glade, wandering across the dark sky.', 'The deep black sky above you seems endless, infinite.', 'The glade looks different in the silver moonshine. Mystical.', 'Small waves form on the pond\'s surface, swirling through the reflected sky.', 'Pale white clouds wander across the sky like scraps of cloth in a dark, endless river.', 'Once the sun has disappeared behind the trees, the forest around you feels strangely alive.', 'The small pond seems to glow slightly in the pale moonlight.'];
         }
         else if(event === 'guest_enter'){
             texts = [name+' visits the glade.', name+' visits the clearing. It\'s nice to see a few new faces around here.', name+' visits the clearing.'];
@@ -714,7 +730,7 @@ Page {
             texts = ['The descending sun paints the sky deep orange. The night is about to begin.', 'The sun is setting. It\'s getting darker around.', 'Slowly, the sun disappears behind a high fir. The night is coming.'];
         }
         else if(event === 'spawnthree'){
-            texts = ['Three moose are standing in front of you. They look friendly.', 'You look around. There, near the edge of the glade, you see three moose.', 'In the high grass you can see three moose eating flowers. They look calm.', 'You can see three moose walking around on the clearing, probably searching food.'];
+            texts = ['Three moose are standing in front of you. They look friendly.', 'You look around. There, near the edge of the glade, you see three moose.', 'In the high grass you can see three moose eating flowers. They look calm.', 'You can see three moose walking around on the clearing, probably searching for food.'];
         }
         else if(event === 'firststart'){
             texts = ['Your story begins on a small clearing in a dark forest.', 'This is where it all starts. A small clearing in the woods.', 'This is the beginning of your story. A small glade in the endless forest.'];

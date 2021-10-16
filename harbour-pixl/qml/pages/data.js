@@ -183,7 +183,7 @@ function getage(id) {
 }
 
 // This function is used to retrieve name gender from the database
-// 0 = male; 1 = female
+// 0 = male; 1 = female; 2 = enby (singular they)
 function getnamegender(id) {
     var db = getDatabase();
     var res = '';
@@ -191,7 +191,7 @@ function getnamegender(id) {
         var rs = tx.executeSql('SELECT val FROM namegender WHERE id=?;', [id]);
         if (rs.rows.length > 0) {
             res = rs.rows.item(0).val;
-            if(res != 1){
+            if(res < 1){
                 res = 0;
             }
         } else {
