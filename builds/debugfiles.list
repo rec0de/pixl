@@ -1,8 +1,0 @@
-%dir /usr/lib/debug
-%dir /usr/lib/debug/usr
-%dir /usr/lib/debug/usr/bin
-%dir /usr/lib/debug/.build-id
-%dir /usr/lib/debug/.build-id/0d
-/usr/lib/debug/usr/bin/harbour-pixl.debug
-/usr/lib/debug/.build-id/0d/7ecddf0c942473300c1bef83e8919157bb0eaf
-/usr/lib/debug/.build-id/0d/7ecddf0c942473300c1bef83e8919157bb0eaf.debug
